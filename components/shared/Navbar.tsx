@@ -1,11 +1,18 @@
-
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
+import { createClient } from "@/utils/supabase/server"
+import { UserNav } from "./UserNav"
+import { UploadModal } from "@/components/gallery/UploadModal"
+import { Toaster } from "@/components/ui/sonner"
 
-export function Navbar() {
+export async function Navbar() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+            <Toaster />
             <div className="container flex h-16 items-center px-4">
                 <Link href="/" className="mr-6 flex items-center space-x-2">
                     <span className="text-xl font-bold tracking-tight">Reference Heaven</span>
@@ -28,7 +35,21 @@ export function Navbar() {
                         <Search className="h-4 w-4" />
                         <span className="sr-only">Search</span>
                     </Button>
-                    <Button size="sm" className="hidden md:flex">Sign In</Button>
+                    {user ? (
+                        <>
+                            <UploadModal />
+                            <UserNav user={user} />
+                        </>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <Link href="/login">
+                                <Button size="sm" variant="ghost" className="hidden md:flex">Sign In</Button>
+                            </Link>
+                            <Link href="/signup">
+                                <Button size="sm" className="hidden md:flex">Sign Up</Button>
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>

@@ -1,12 +1,13 @@
 
-export interface ReferenceImage {
+export interface Image {
     id: string
-    url: string
+    created_at: string
     title: string
-    artist_name: string
-    source_url?: string
-    technical_tags: string[]
-    created_at?: string
+    description?: string
+    url: string
+    width?: number
+    height?: number
+    artist_id: string
+    topic?: string
+    likes_count: number
 }
-
-export type ReferenceImageInput = Omit<ReferenceImage, 'id' | 'created_at'>

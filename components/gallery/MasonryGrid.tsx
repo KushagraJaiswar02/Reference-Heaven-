@@ -1,26 +1,37 @@
-
+import { Image as ImageType } from "@/types"
 import Image from "next/image"
 
-const PLACEHOLDER_IMAGES = [
-    "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1633511090164-b43840ea1607?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1621574539164-9d57a4a90403?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=60",
-]
+interface MasonryGridProps {
+    images: ImageType[]
+}
 
-export function MasonryGrid() {
+export function MasonryGrid({ images }: MasonryGridProps) {
+    if (!images || images.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
+                <p>No images found.</p>
+                <p className="text-sm">Be the first to upload one!</p>
+            </div>
+        )
+    }
+
     return (
         <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4 space-y-4 p-4">
-            {PLACEHOLDER_IMAGES.map((src, i) => (
-                <div key={i} className="relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer break-inside-avoid">
-                    {/* Using standard img for simplicity in placeholder, or Next Image with defined width/height if we knew them. Unsplash URLs are variable. 
-                For Masonry, we usually need aspect ratio or just let it flow. 
-             */}
-                    <img src={src} alt={`Reference ${i}`} className="w-full object-cover rounded-lg" loading="lazy" />
+            {images.map((image) => (
+                <div key={image.id} className="relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer break-inside-avoid group">
+                    <Image
+                        src={image.url}
+                        alt={image.title}
+                        width={600}
+                        height={400}
+                        className="w-full h-auto object-cover rounded-lg bg-muted"
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                        <div>
+                            <p className="font-semibold text-white text-sm truncate">{image.title}</p>
+                            {image.topic && <p className="text-xs text-white/80">{image.topic}</p>}
+                        </div>
+                    </div>
                 </div>
             ))}
         </div>
