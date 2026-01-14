@@ -66,6 +66,24 @@ export function UploadModal() {
                             <Input id="topic" name="topic" placeholder="e.g., Sci-Fi, Environment" />
                         </div>
                         <div className="grid gap-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Input id="description" name="description" placeholder="Describe the image..." />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="lighting_style">Lighting Style</Label>
+                                <Input id="lighting_style" name="lighting_style" placeholder="e.g. Rim Light" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="perspective_angle">Perspective</Label>
+                                <Input id="perspective_angle" name="perspective_angle" placeholder="e.g. Low Angle" />
+                            </div>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="color_palette">Color Palette (Hex codes)</Label>
+                            <Input id="color_palette" name="color_palette" placeholder="#ff0000, #00ff00" />
+                        </div>
+                        <div className="grid gap-2">
                             <Label htmlFor="file">Image File</Label>
                             <Input id="file" name="file" type="file" required accept="image/*" />
                         </div>
@@ -78,6 +96,6 @@ export function UploadModal() {
                     </DialogFooter>
                 </form>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }

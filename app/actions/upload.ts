@@ -17,6 +17,15 @@ export async function uploadImage(formData: FormData) {
     const file = formData.get('file') as File
     const title = formData.get('title') as string
     const topic = formData.get('topic') as string
+    const description = formData.get('description') as string
+    const lighting_style = formData.get('lighting_style') as string
+    const perspective_angle = formData.get('perspective_angle') as string
+    const color_palette_str = formData.get('color_palette') as string
+
+    // Parse color palette from comma-separated string
+    const color_palette = color_palette_str
+        ? color_palette_str.split(',').map(c => c.trim()).filter(c => c.startsWith('#'))
+        : []
 
     if (!file || !title) {
         throw new Error('Missing required fields')
@@ -46,9 +55,13 @@ export async function uploadImage(formData: FormData) {
         .insert({
             title,
             topic,
+            description,
             url: publicUrl,
             artist_id: user.id, // linked to profiles via RLS/FK
-            likes_count: 0
+            likes_count: 0,
+            lighting_style,
+            perspective_angle,
+            color_palette
         })
 
     if (dbError) {
