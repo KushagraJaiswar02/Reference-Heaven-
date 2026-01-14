@@ -1,37 +1,119 @@
-
 "use client"
 
 import { useRouter } from "next/navigation"
-import { use } from "react"
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog"
+import { use, useEffect, useState } from "react"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Share2, Link as LinkIcon, Download, Heart, Maximize2, MoreHorizontal } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Share2, Link as LinkIcon, MoreHorizontal, Maximize2, Pencil, Trash2, X, Save } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
 import { Image as ImageType } from "@/types"
+import { deleteImage } from "@/app/actions/deleteImage"
+import { updateImage } from "@/app/actions/updateImage"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function ImageModal({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
     const router = useRouter()
     const [image, setImage] = useState<ImageType | null>(null)
     const [loading, setLoading] = useState(true)
+    const [currentUser, setCurrentUser] = useState<any>(null)
+    const [isEditing, setIsEditing] = useState(false)
+    const [editLoading, setEditLoading] = useState(false)
+
+    // Edit Form State
+    const [title, setTitle] = useState("")
+    const [topic, setTopic] = useState("")
 
     useEffect(() => {
-        const fetchImage = async () => {
+        const fetchData = async () => {
             const supabase = createClient()
-            const { data } = await supabase
+
+            // Fetch Image
+            const { data: imageData, error } = await supabase
                 .from("images")
                 .select("*, profiles(*)")
                 .eq("id", id)
                 .single()
 
-            if (data) setImage(data)
+            if (imageData) {
+                setImage(imageData)
+                setTitle(imageData.title)
+                setTopic(imageData.topic || "")
+            }
+
+            // Fetch User
+            const { data: { user } } = await supabase.auth.getUser()
+            console.log("Current User:", user)
+            console.log("Image Artist ID:", imageData?.artist_id)
+            setCurrentUser(user)
+
             setLoading(false)
         }
-        fetchImage()
+        fetchData()
     }, [id])
+
+    const isOwner = currentUser && image && currentUser.id === image.artist_id
+    console.log("Is Owner:", isOwner)
+
+    const handleDelete = async () => {
+        if (!image) return
+
+        try {
+            const res = await deleteImage(image.id)
+            if (res.error) {
+                toast.error(res.error)
+            } else {
+                toast.success("Image deleted successfully")
+                router.back() // Close modal
+                // Ideally also refresh the list behind, but router.back() + revalidate in action should work enough for now. 
+                // However, user requested "redirected back to the gallery". 
+                // If this is an intercepting route, router.back() goes to the underlying page (gallery).
+            }
+        } catch (error) {
+            toast.error("An error occurred")
+        }
+    }
+
+    const handleUpdate = async () => {
+        if (!image) return
+        setEditLoading(true)
+
+        try {
+            const formData = new FormData()
+            formData.append('id', image.id)
+            formData.append('title', title)
+            formData.append('topic', topic)
+
+            const res = await updateImage(formData)
+
+            if (res.error) {
+                toast.error(res.error)
+            } else {
+                toast.success("Image updated successfully")
+                setIsEditing(false)
+                setImage(prev => prev ? { ...prev, title, topic } : null)
+            }
+        } catch (error) {
+            toast.error("An error occurred while updating")
+        } finally {
+            setEditLoading(false)
+        }
+    }
 
     return (
         <Dialog defaultOpen open={true} onOpenChange={() => router.back()}>
@@ -47,20 +129,7 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                     onClick={() => router.back()}
                     className="absolute top-4 left-4 z-50 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                    </svg>
+                    <X className="w-6 h-6" />
                 </button>
 
                 {loading ? (
@@ -103,29 +172,98 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                                         <LinkIcon className="w-5 h-5" />
                                     </Button>
                                 </div>
-                                <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold px-6">
-                                    Save
-                                </Button>
+
+                                {isOwner ? (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="rounded-full hover:bg-white/10 text-white"
+                                            onClick={() => setIsEditing(!isEditing)}
+                                        >
+                                            <Pencil className="w-5 h-5" />
+                                        </Button>
+
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="rounded-full hover:bg-red-500/20 text-red-500">
+                                                    <Trash2 className="w-5 h-5" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. This will permanently delete your image.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                                                        Delete
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                ) : (
+                                    <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold px-6">
+                                        Save
+                                    </Button>
+                                )}
                             </div>
 
                             {/* Scrollable Content */}
                             <div className="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar">
-                                <h1 className="text-3xl font-bold text-white mb-4 leading-tight">{image.title}</h1>
+                                {isEditing ? (
+                                    <div className="space-y-4 mb-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="title" className="text-white">Title</Label>
+                                            <Input
+                                                id="title"
+                                                value={title}
+                                                onChange={(e) => setTitle(e.target.value)}
+                                                className="bg-white/5 border-white/10 text-white"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="topic" className="text-white">Topic</Label>
+                                            <Input
+                                                id="topic"
+                                                value={topic}
+                                                onChange={(e) => setTopic(e.target.value)}
+                                                className="bg-white/5 border-white/10 text-white"
+                                            />
+                                        </div>
+                                        <div className="flex gap-2 justify-end mt-4">
+                                            <Button variant="ghost" onClick={() => setIsEditing(false)} className="text-white hover:bg-white/10">
+                                                Cancel
+                                            </Button>
+                                            <Button onClick={handleUpdate} disabled={editLoading} className="bg-white text-black hover:bg-zinc-200">
+                                                {editLoading ? "Saving..." : "Save Changes"}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <h1 className="text-3xl font-bold text-white mb-4 leading-tight">{image.title}</h1>
 
-                                {image.description && (
-                                    <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-                                        {image.description}
-                                    </p>
+                                        {image.description && (
+                                            <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
+                                                {image.description}
+                                            </p>
+                                        )}
+                                    </>
                                 )}
 
                                 {/* Artist Block */}
                                 <div className="flex items-center gap-3 mb-8">
                                     <Avatar className="w-10 h-10">
-                                        <AvatarImage src={image.profiles?.avatar_url} />
-                                        <AvatarFallback>{image.profiles?.username?.charAt(0)}</AvatarFallback>
+                                        <AvatarImage src={image.profiles?.avatar_url || ""} />
+                                        <AvatarFallback>{image.profiles?.username?.charAt(0) || "?"}</AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <p className="text-sm font-semibold text-white">{image.profiles?.username}</p>
+                                        <p className="text-sm font-semibold text-white">{image.profiles?.username || "Unknown"}</p>
                                         <p className="text-xs text-zinc-500">1.2k followers</p>
                                     </div>
                                     <Button variant="secondary" className="ml-auto rounded-full text-xs font-semibold h-8 bg-white/10 hover:bg-white/20 text-white border-none">
@@ -180,7 +318,7 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                             </div>
 
                             {/* Sticky Footer */}
-                            <div className="p-4 border-t border-white/5 bg-zinc-900 flex justify-center">
+                            <div className="p-4 border-t border-white/5 bg-zinc-900 flex flex-col gap-2 justify-center">
                                 <Button
                                     variant="outline"
                                     className="rounded-full border-white/10 hover:bg-white/5 text-white w-full"
@@ -189,6 +327,8 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                                     <Maximize2 className="w-4 h-4 mr-2" />
                                     Open Full Page
                                 </Button>
+
+
                             </div>
                         </div>
                     </>
