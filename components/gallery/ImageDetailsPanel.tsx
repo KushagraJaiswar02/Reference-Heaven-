@@ -221,19 +221,21 @@ export function ImageDetailsPanel({ image: initialImage, currentUser }: ImageDet
                         </div>
 
                         {/* Artist Profile - Glassmorphic */}
-                        <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5 backdrop-blur-md hover:bg-white/[0.06] transition-all cursor-pointer group shadow-lg shadow-black/20">
-                            <Avatar className="w-10 h-10 ring-2 ring-white/10 group-hover:ring-indigo-500/50 transition-all">
-                                <AvatarImage src={image.profiles?.avatar_url || ""} className="object-cover" />
-                                <AvatarFallback className="bg-zinc-800 text-zinc-400 text-xs">{image.profiles?.username?.charAt(0) || '?'}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-medium text-white text-sm truncate group-hover:text-indigo-400 transition-colors">{image.profiles?.username || 'Unknown Artist'}</p>
-                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Creator</p>
+                        <Link href={`/profile/${image.profiles?.username}`} className="block">
+                            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5 backdrop-blur-md hover:bg-white/[0.06] transition-all cursor-pointer group shadow-lg shadow-black/20">
+                                <Avatar className="w-10 h-10 ring-2 ring-white/10 group-hover:ring-indigo-500/50 transition-all">
+                                    <AvatarImage src={image.profiles?.avatar_url || ""} className="object-cover" />
+                                    <AvatarFallback className="bg-zinc-800 text-zinc-400 text-xs">{image.profiles?.username?.charAt(0) || '?'}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-white text-sm truncate group-hover:text-indigo-400 transition-colors">{image.profiles?.username || 'Unknown Artist'}</p>
+                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Creator</p>
+                                </div>
+                                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-zinc-400 hover:text-white hover:bg-white/10 -translate-x-2 group-hover:translate-x-0">
+                                    Follow
+                                </Button>
                             </div>
-                            <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-zinc-400 hover:text-white hover:bg-white/10 -translate-x-2 group-hover:translate-x-0">
-                                Follow
-                            </Button>
-                        </div>
+                        </Link>
 
                         <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
 

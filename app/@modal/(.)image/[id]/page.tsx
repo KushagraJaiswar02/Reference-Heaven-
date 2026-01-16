@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { use, useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import Image from "next/image"
@@ -256,18 +257,22 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                                 )}
 
                                 {/* Artist Block */}
-                                <div className="flex items-center gap-3 mb-8">
-                                    <Avatar className="w-10 h-10">
-                                        <AvatarImage src={image.profiles?.avatar_url || ""} />
-                                        <AvatarFallback>{image.profiles?.username?.charAt(0) || "?"}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="text-sm font-semibold text-white">{image.profiles?.username || "Unknown"}</p>
-                                        <p className="text-xs text-zinc-500">1.2k followers</p>
+                                <div onClick={() => window.location.href = `/profile/${image.profiles?.username}`} className="block group mb-8 cursor-pointer">
+                                    <div className="flex items-center gap-3 p-2 rounded-lg -mx-2 hover:bg-white/5 transition-colors">
+                                        <Avatar className="w-10 h-10 ring-2 ring-transparent group-hover:ring-white/10 transition-all">
+                                            <AvatarImage src={image.profiles?.avatar_url || ""} />
+                                            <AvatarFallback>{image.profiles?.username?.charAt(0) || "?"}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-semibold text-white group-hover:text-indigo-400 transition-colors">
+                                                {image.profiles?.username || "Unknown"}
+                                            </p>
+                                            <p className="text-xs text-zinc-500">1.2k followers</p>
+                                        </div>
+                                        <Button variant="secondary" className="ml-auto rounded-full text-xs font-semibold h-8 bg-white/10 hover:bg-white/20 text-white border-none group-hover:bg-white/20">
+                                            Visit
+                                        </Button>
                                     </div>
-                                    <Button variant="secondary" className="ml-auto rounded-full text-xs font-semibold h-8 bg-white/10 hover:bg-white/20 text-white border-none">
-                                        Follow
-                                    </Button>
                                 </div>
 
                                 {/* Comments / Metadata Section */}
