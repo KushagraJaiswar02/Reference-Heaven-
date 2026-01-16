@@ -50,3 +50,7 @@ export async function signup(formData: FormData) {
     revalidatePath('/', 'layout')
     redirect('/')
 }
+
+export async function revalidateAll() {
+    revalidatePath('/', 'layout')
+}

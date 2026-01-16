@@ -8,34 +8,86 @@ import { createClient } from "@/utils/supabase/client"
 import { UserNav } from "./UserNav"
 import { UploadModal } from "@/components/gallery/UploadModal"
 import { Toaster } from "@/components/ui/sonner"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
+import { useRouter, usePathname } from "next/navigation"
+import { toast } from "sonner"
 
 export function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [user, setUser] = useState<any>(null)
     const [profile, setProfile] = useState<any>(null)
     const supabase = createClient()
+    const router = useRouter()
+    const isInitialMount = useRef(true)
+    const currentUserRef = useRef<any>(null)
 
     useEffect(() => {
-        const getUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser()
-            setUser(user)
-            if (user) {
+        const fetchUserData = async (currUser: any) => {
+            if (currUser) {
                 const { data } = await supabase
                     .from('profiles')
                     .select('*')
-                    .eq('id', user.id)
+                    .eq('id', currUser.id)
                     .single()
                 setProfile(data)
+            } else {
+                setProfile(null)
             }
         }
+
+        // Initial fetch
+        const getUser = async () => {
+            const { data: { user: initialUser } } = await supabase.auth.getUser()
+            setUser(initialUser)
+            currentUserRef.current = initialUser
+            if (initialUser) await fetchUserData(initialUser)
+
+            // Short delay to ensure we don't trigger "Welcome back" on initial load
+            setTimeout(() => {
+                isInitialMount.current = false
+            }, 500)
+        }
         getUser()
-    }, [supabase])
+
+        // Auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            const newUser = session?.user || null
+            const previousUser = currentUserRef.current
+
+            currentUserRef.current = newUser
+            setUser(newUser)
+            await fetchUserData(newUser)
+
+            if (event === 'SIGNED_IN') {
+                if (!isInitialMount.current && !previousUser) {
+                    toast.success("Welcome back!", {
+                        description: "You have successfully logged in."
+                    })
+                    router.refresh()
+                }
+            }
+
+            if (event === 'SIGNED_OUT') {
+                setIsMenuOpen(false)
+                if (!isInitialMount.current) {
+                    toast.success("You have logged off")
+                    router.refresh()
+                }
+            }
+
+            if (event === 'USER_UPDATED') {
+                router.refresh()
+            }
+        })
+
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [supabase, router]) // Removed user to prevent re-subscriptions
 
     return (
         <>
-            <Toaster />
             <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-zinc-950/70 backdrop-blur-md transition-all duration-300">
                 <div className="container flex h-16 items-center px-4 md:px-6 max-w-7xl mx-auto gap-4 md:gap-8">
                     {/* Left: Brand */}

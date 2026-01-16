@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function UserNav({ user, profile }: { user: any, profile: any }) {
     const router = useRouter()
@@ -25,7 +26,8 @@ export function UserNav({ user, profile }: { user: any, profile: any }) {
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
-        router.refresh()
+        router.push("/")
+        // router.refresh() is now handled in Navbar.tsx listener
     }
 
     return (
