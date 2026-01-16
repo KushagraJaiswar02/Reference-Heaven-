@@ -57,5 +57,5 @@ export async function deleteImage(imageId: string) {
 
     // 5. Revalidate
     revalidatePath('/')
-    return { success: true }
+    redirect('/')
 }

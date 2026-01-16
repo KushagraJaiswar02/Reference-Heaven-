@@ -74,17 +74,16 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
         if (!image) return
 
         try {
+            // deleteImage now redirects on success, so we rely on that.
             const res = await deleteImage(image.id)
-            if (res.error) {
+            // If we are here, it didn't redirect (e.g. error returned as object)
+            if (res && res.error) {
                 toast.error(res.error)
-            } else {
-                toast.success("Image deleted successfully")
-                router.back() // Close modal
-                // Ideally also refresh the list behind, but router.back() + revalidate in action should work enough for now. 
-                // However, user requested "redirected back to the gallery". 
-                // If this is an intercepting route, router.back() goes to the underlying page (gallery).
             }
-        } catch (error) {
+        } catch (error: any) {
+            if (error.digest?.startsWith('NEXT_REDIRECT')) {
+                throw error
+            }
             toast.error("An error occurred")
         }
     }
