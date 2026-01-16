@@ -4,7 +4,9 @@ import Link from "next/link"
 import { MasonryGrid } from "@/components/gallery/MasonryGrid"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Globe, Instagram, Twitter, Palette } from "lucide-react"
 import { notFound } from "next/navigation"
+import { ProfileSettings } from "@/components/profile/ProfileSettings"
 
 interface Props {
     params: {
@@ -71,6 +73,54 @@ export default async function ProfilePage({ params }: Props) {
                                     {profile.bio}
                                 </p>
                             )}
+
+                            {/* Social Links */}
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
+                                {profile.website && (
+                                    <a
+                                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
+                                    >
+                                        <Globe className="w-4 h-4" />
+                                        <span className="text-sm">{new URL(profile.website.startsWith('http') ? profile.website : `https://${profile.website}`).hostname}</span>
+                                    </a>
+                                )}
+
+                                {profile.socials?.instagram && (
+                                    <a
+                                        href={`https://instagram.com/${profile.socials.instagram.replace('@', '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-pink-500 hover:bg-white transition-all"
+                                    >
+                                        <Instagram className="w-5 h-5" />
+                                    </a>
+                                )}
+
+                                {profile.socials?.twitter && (
+                                    <a
+                                        href={`https://twitter.com/${profile.socials.twitter.replace('@', '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-blue-400 hover:bg-white transition-all"
+                                    >
+                                        <Twitter className="w-5 h-5" />
+                                    </a>
+                                )}
+
+                                {profile.socials?.artstation && (
+                                    <a
+                                        href={`https://artstation.com/${profile.socials.artstation}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-[#13aff0] hover:bg-white transition-all"
+                                    >
+                                        <Palette className="w-5 h-5" />
+                                    </a>
+                                )}
+                            </div>
                         </div>
 
                         {/* Stats Bar */}
@@ -93,11 +143,7 @@ export default async function ProfilePage({ params }: Props) {
 
                         <div className="flex justify-center md:justify-start">
                             {currentUser && currentUser.id === profile.id ? (
-                                <Link href="/settings/profile">
-                                    <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 font-bold">
-                                        Edit Profile
-                                    </Button>
-                                </Link>
+                                <ProfileSettings profile={profile} />
                             ) : (
                                 <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 font-bold">
                                     Follow
