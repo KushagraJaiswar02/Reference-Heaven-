@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { useRouter, usePathname } from "next/navigation"
 import { toast } from "sonner"
+import { Layers } from "lucide-react"
 
 export function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -119,15 +120,24 @@ export function Navbar() {
                     <div className="flex items-center gap-4 md:gap-6">
                         {/* Desktop Nav */}
                         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                            {['Gallery', 'Collections', 'Artists'].map((item) => (
-                                <Link
-                                    key={item}
-                                    href={item === 'Gallery' ? '/' : `/${item.toLowerCase()}`}
-                                    className="text-zinc-400 hover:text-white transition-colors duration-200"
-                                >
-                                    {item}
-                                </Link>
-                            ))}
+                            <Link
+                                href="/"
+                                className="text-zinc-400 hover:text-white transition-colors duration-200"
+                            >
+                                Gallery
+                            </Link>
+                            <Link
+                                href="/collections"
+                                className="text-zinc-400 hover:text-white transition-colors duration-200"
+                            >
+                                Collections
+                            </Link>
+                            <Link
+                                href="/artists"
+                                className="text-zinc-400 hover:text-white transition-colors duration-200"
+                            >
+                                Artists
+                            </Link>
                             {user && (
                                 <Link
                                     href="/saved"
@@ -176,16 +186,27 @@ export function Navbar() {
                             className="bg-white/5 border-none text-white pl-12 h-12 w-full rounded-xl focus-visible:ring-1 focus-visible:ring-white/20 placeholder:text-zinc-600"
                         />
                     </div>
-                    {['Gallery', 'Collections', 'Artists'].map((item) => (
-                        <Link
-                            key={item}
-                            href={item === 'Gallery' ? '/' : `/${item.toLowerCase()}`}
-                            className="text-zinc-400 hover:text-white border-b border-white/5 pb-4"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            {item}
-                        </Link>
-                    ))}
+                    <Link
+                        href="/"
+                        className="text-zinc-400 hover:text-white border-b border-white/5 pb-4"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        Gallery
+                    </Link>
+                    <Link
+                        href="/collections"
+                        className="text-zinc-400 hover:text-white border-b border-white/5 pb-4"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        Collections
+                    </Link>
+                    <Link
+                        href="/artists"
+                        className="text-zinc-400 hover:text-white border-b border-white/5 pb-4"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        Artists
+                    </Link>
                     {user && (
                         <Link
                             href="/saved"
