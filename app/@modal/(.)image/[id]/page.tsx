@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Share2, Link as LinkIcon, MoreHorizontal, Maximize2, Pencil, Trash2, X, Save } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
+import { SaveButton } from "@/components/SaveButton"
 import { Image as ImageType } from "@/types"
 import { deleteImage } from "@/app/actions/deleteImage"
 import { updateImage } from "@/app/actions/updateImage"
@@ -35,6 +36,7 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
     const [currentUser, setCurrentUser] = useState<any>(null)
     const [isEditing, setIsEditing] = useState(false)
     const [editLoading, setEditLoading] = useState(false)
+    const [isSaved, setIsSaved] = useState(false)
 
     // Edit Form State
     const [title, setTitle] = useState("")
@@ -62,6 +64,17 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
             console.log("Current User:", user)
             console.log("Image Artist ID:", imageData?.artist_id)
             setCurrentUser(user)
+
+            // Fetch Saved Status
+            if (user && imageData) {
+                const { data: save } = await supabase
+                    .from('saves')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('image_id', imageData.id)
+                    .single()
+                setIsSaved(!!save)
+            }
 
             setLoading(false)
         }
@@ -207,9 +220,13 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                                         </AlertDialog>
                                     </div>
                                 ) : (
-                                    <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold px-6">
-                                        Save
-                                    </Button>
+                                    currentUser && (
+                                        <SaveButton
+                                            imageId={image.id}
+                                            initialIsSaved={isSaved}
+                                            className="text-zinc-400 hover:text-white"
+                                        />
+                                    )
                                 )}
                             </div>
 

@@ -24,13 +24,15 @@ import { toast } from "sonner"
 import { deleteImage } from "@/app/actions/deleteImage"
 import { updateImage } from "@/app/actions/updateImage"
 import { Image as ImageType } from "@/types" // Ensure this type exists or use 'any' temporarily if unsure
+import { SaveButton } from "@/components/SaveButton"
 
 interface ImageDetailsPanelProps {
     image: ImageType & { profiles: any } // Adjust type as needed
     currentUser: any
+    isSaved: boolean
 }
 
-export function ImageDetailsPanel({ image: initialImage, currentUser }: ImageDetailsPanelProps) {
+export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved }: ImageDetailsPanelProps) {
     const router = useRouter()
     const [image, setImage] = useState(initialImage)
     const [isEditing, setIsEditing] = useState(false)
@@ -147,9 +149,14 @@ export function ImageDetailsPanel({ image: initialImage, currentUser }: ImageDet
                             </AlertDialog>
                         </>
                     ) : (
-                        <Button className="rounded-lg font-medium bg-indigo-600 hover:bg-indigo-500 text-white px-5 text-sm shadow-lg shadow-indigo-500/10 transition-all">
-                            Save
-                        </Button>
+                        currentUser && (
+                            <SaveButton
+                                imageId={image.id}
+                                initialIsSaved={isSaved}
+                                className="w-full justify-center"
+                                showLabel={true}
+                            />
+                        )
                     )}
                 </div>
             </div>

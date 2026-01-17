@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Menu, X } from "lucide-react"
+import { Search, Menu, X, Bookmark } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
 import { UserNav } from "./UserNav"
 import { UploadModal } from "@/components/gallery/UploadModal"
@@ -128,6 +128,15 @@ export function Navbar() {
                                     {item}
                                 </Link>
                             ))}
+                            {user && (
+                                <Link
+                                    href="/saved"
+                                    className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors duration-200"
+                                >
+                                    <Bookmark className="w-4 h-4" />
+                                    <span>Saved</span>
+                                </Link>
+                            )}
                         </nav>
 
                         <div className="h-6 w-[1px] bg-white/10 hidden md:block"></div>
@@ -177,6 +186,16 @@ export function Navbar() {
                             {item}
                         </Link>
                     ))}
+                    {user && (
+                        <Link
+                            href="/saved"
+                            className="flex items-center gap-2 text-zinc-400 hover:text-white border-b border-white/5 pb-4"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            <Bookmark className="w-4 h-4" />
+                            <span>Saved</span>
+                        </Link>
+                    )}
                     {!user && (
                         <Link href="/login" className="text-zinc-400 hover:text-white border-b border-white/5 pb-4" onClick={() => setIsMenuOpen(false)}>
                             Sign In

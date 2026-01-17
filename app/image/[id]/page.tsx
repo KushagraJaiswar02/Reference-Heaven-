@@ -22,6 +22,17 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
         return notFound()
     }
 
+    let isSaved = false
+    if (user) {
+        const { data: save } = await supabase
+            .from('saves')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('image_id', id)
+            .single()
+        isSaved = !!save
+    }
+
     return (
         <div className="container mx-auto px-4 py-8 flex flex-col items-center">
             {/* Back Nav */}
@@ -46,7 +57,7 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
                     </div>
                 </div>
 
-                <ImageDetailsPanel image={image as any} currentUser={user} />
+                <ImageDetailsPanel image={image as any} currentUser={user} isSaved={isSaved} />
             </div>
         </div>
     )

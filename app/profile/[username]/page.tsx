@@ -9,9 +9,9 @@ import { notFound } from "next/navigation"
 import { ProfileSettings } from "@/components/profile/ProfileSettings"
 
 interface Props {
-    params: {
+    params: Promise<{
         username: string
-    }
+    }>
 }
 
 const getSocialUrl = (input: string, platform: 'instagram' | 'twitter' | 'artstation' | 'linkedin' | 'youtube') => {
@@ -56,7 +56,9 @@ export default async function ProfilePage({ params }: Props) {
         notFound()
     }
 
-    // 2. Fetch Images
+    const isOwner = currentUser && currentUser.id === profile.id
+
+    // 2. Fetch Portfolio (Uploads)
     const { data: images, error: imagesError } = await supabase
         .from('images')
         .select(`
@@ -182,16 +184,18 @@ export default async function ProfilePage({ params }: Props) {
                                 <p className="text-2xl font-bold text-white">0</p>
                                 <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Followers</p>
                             </div>
-                            <div className="w-[1px] h-8 bg-white/10"></div>
-                            <div className="text-center md:text-left">
-                                <p className="text-2xl font-bold text-white">0</p>
-                                <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Following</p>
-                            </div>
                         </div>
 
-                        <div className="flex justify-center md:justify-start">
-                            {currentUser && currentUser.id === profile.id ? (
-                                <ProfileSettings profile={profile} />
+                        <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
+                            {isOwner ? (
+                                <>
+                                    <ProfileSettings profile={profile} />
+                                    <Link href="/saved">
+                                        <Button variant="outline" className="rounded-full px-6 border-zinc-700 text-zinc-300 hover:text-white hover:border-white hover:bg-zinc-800 transition-all">
+                                            Saved References
+                                        </Button>
+                                    </Link>
+                                </>
                             ) : (
                                 <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 font-bold">
                                     Follow
