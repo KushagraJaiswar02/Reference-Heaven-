@@ -4,13 +4,39 @@ import Link from "next/link"
 import { MasonryGrid } from "@/components/gallery/MasonryGrid"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Globe, Instagram, Twitter, Palette } from "lucide-react"
+import { Globe, Instagram, Twitter, Palette, Linkedin, Youtube } from "lucide-react"
 import { notFound } from "next/navigation"
 import { ProfileSettings } from "@/components/profile/ProfileSettings"
 
 interface Props {
     params: {
         username: string
+    }
+}
+
+const getSocialUrl = (input: string, platform: 'instagram' | 'twitter' | 'artstation' | 'linkedin' | 'youtube') => {
+    if (!input) return ''
+    // If it's already a URL, return it
+    if (input.startsWith('http://') || input.startsWith('https://')) {
+        return input
+    }
+
+    // Clean username
+    const cleanInput = input.replace('@', '')
+
+    switch (platform) {
+        case 'instagram':
+            return `https://instagram.com/${cleanInput}`
+        case 'twitter':
+            return `https://twitter.com/${cleanInput}`
+        case 'artstation':
+            return `https://artstation.com/${cleanInput}`
+        case 'linkedin':
+            return `https://linkedin.com/in/${cleanInput}`
+        case 'youtube':
+            return `https://youtube.com/@${cleanInput}`
+        default:
+            return input
     }
 }
 
@@ -90,7 +116,7 @@ export default async function ProfilePage({ params }: Props) {
 
                                 {profile.socials?.instagram && (
                                     <a
-                                        href={`https://instagram.com/${profile.socials.instagram.replace('@', '')}`}
+                                        href={getSocialUrl(profile.socials.instagram, 'instagram')}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-pink-500 hover:bg-white transition-all"
@@ -101,7 +127,7 @@ export default async function ProfilePage({ params }: Props) {
 
                                 {profile.socials?.twitter && (
                                     <a
-                                        href={`https://twitter.com/${profile.socials.twitter.replace('@', '')}`}
+                                        href={getSocialUrl(profile.socials.twitter, 'twitter')}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-blue-400 hover:bg-white transition-all"
@@ -112,12 +138,34 @@ export default async function ProfilePage({ params }: Props) {
 
                                 {profile.socials?.artstation && (
                                     <a
-                                        href={`https://artstation.com/${profile.socials.artstation}`}
+                                        href={getSocialUrl(profile.socials.artstation, 'artstation')}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-[#13aff0] hover:bg-white transition-all"
                                     >
                                         <Palette className="w-5 h-5" />
+                                    </a>
+                                )}
+
+                                {profile.socials?.linkedin && (
+                                    <a
+                                        href={getSocialUrl(profile.socials.linkedin, 'linkedin')}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-[#0077b5] hover:bg-white transition-all"
+                                    >
+                                        <Linkedin className="w-5 h-5" />
+                                    </a>
+                                )}
+
+                                {profile.socials?.youtube && (
+                                    <a
+                                        href={getSocialUrl(profile.socials.youtube, 'youtube')}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-[#FF0000] hover:bg-white transition-all"
+                                    >
+                                        <Youtube className="w-5 h-5" />
                                     </a>
                                 )}
                             </div>

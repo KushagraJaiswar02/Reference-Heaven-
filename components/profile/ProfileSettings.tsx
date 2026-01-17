@@ -35,7 +35,9 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
         socials: {
             instagram: profile.socials?.instagram || '',
             twitter: profile.socials?.twitter || '',
-            artstation: profile.socials?.artstation || ''
+            artstation: profile.socials?.artstation || '',
+            linkedin: profile.socials?.linkedin || '',
+            youtube: profile.socials?.youtube || ''
         }
     })
 
@@ -145,6 +147,24 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
                                 onChange={(e) => setFormData(prev => ({
                                     ...prev,
                                     socials: { ...prev.socials, artstation: e.target.value }
+                                }))}
+                            />
+                            <Input
+                                placeholder="LinkedIn username or URL"
+                                className="bg-zinc-900 border-zinc-800 focus:ring-white/20"
+                                value={formData.socials.linkedin}
+                                onChange={(e) => setFormData(prev => ({
+                                    ...prev,
+                                    socials: { ...prev.socials, linkedin: e.target.value }
+                                }))}
+                            />
+                            <Input
+                                placeholder="YouTube handle or URL"
+                                className="bg-zinc-900 border-zinc-800 focus:ring-white/20"
+                                value={formData.socials.youtube}
+                                onChange={(e) => setFormData(prev => ({
+                                    ...prev,
+                                    socials: { ...prev.socials, youtube: e.target.value }
                                 }))}
                             />
                         </div>
