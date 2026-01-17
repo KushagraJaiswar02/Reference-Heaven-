@@ -25,14 +25,17 @@ import { deleteImage } from "@/app/actions/deleteImage"
 import { updateImage } from "@/app/actions/updateImage"
 import { Image as ImageType } from "@/types" // Ensure this type exists or use 'any' temporarily if unsure
 import { SaveButton } from "@/components/SaveButton"
+import { TagInput } from "@/components/tags/TagInput"
+import { TagList } from "@/components/tags/TagList"
 
 interface ImageDetailsPanelProps {
     image: ImageType & { profiles: any } // Adjust type as needed
     currentUser: any
     isSaved: boolean
+    tags?: any[]
 }
 
-export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved }: ImageDetailsPanelProps) {
+export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, tags: initialTags = [] }: ImageDetailsPanelProps) {
     const router = useRouter()
     const [image, setImage] = useState(initialImage)
     const [isEditing, setIsEditing] = useState(false)
@@ -306,6 +309,29 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved }:
                                             </button>
                                         ))}
                                     </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Manual Tags Section */}
+                        <div className="space-y-4 pt-4 border-t border-white/5">
+                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 pl-1">
+                                Tags
+                            </h3>
+
+                            {initialTags.length > 0 ? (
+                                <TagList
+                                    tags={initialTags}
+                                    currentUserId={currentUser?.id}
+                                    imageOwnerId={initialImage.artist_id}
+                                />
+                            ) : (
+                                <p className="text-xs text-zinc-500 italic pl-1">No tags added yet.</p>
+                            )}
+
+                            {currentUser && (
+                                <div className="pt-2">
+                                    <TagInput imageId={initialImage.id} />
                                 </div>
                             )}
                         </div>

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { ImageDetailsPanel } from "@/components/gallery/ImageDetailsPanel"
+import { getTagsByImage } from "@/app/actions/tags"
 
 export default async function ImagePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -31,7 +32,10 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
             .eq('image_id', id)
             .single()
         isSaved = !!save
+        isSaved = !!save
     }
+
+    const { tags } = await getTagsByImage(id)
 
     return (
         <div className="container mx-auto px-4 py-8 flex flex-col items-center">
@@ -57,7 +61,7 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
                     </div>
                 </div>
 
-                <ImageDetailsPanel image={image as any} currentUser={user} isSaved={isSaved} />
+                <ImageDetailsPanel image={image as any} currentUser={user} isSaved={isSaved} tags={tags} />
             </div>
         </div>
     )
