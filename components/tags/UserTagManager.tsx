@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from "react"
-import { manageUserTag, removeUserTag, getUserTags } from "@/app/actions/tagging/user"
+import { manageUserTag, removeUserTag, getUserTags, getUserUniqueTags } from "@/app/actions/tagging/user"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,6 +25,7 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
     const [inputValue, setInputValue] = useState("")
     const [isPublic, setIsPublic] = useState(false)
     const [submitting, setSubmitting] = useState(false)
+    const [suggestions, setSuggestions] = useState<string[]>([])
 
     const fetchTags = async () => {
         const data = await getUserTags(imageId)
@@ -32,19 +33,32 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
         setLoading(false)
     }
 
+    const fetchSuggestions = async () => {
+        const uniqueTags = await getUserUniqueTags()
+        setSuggestions(uniqueTags || [])
+    }
+
     useEffect(() => {
         fetchTags()
+        fetchSuggestions()
     }, [imageId])
 
     const handleAdd = async () => {
-        if (!inputValue.trim()) return
+        const cleanVal = inputValue.trim().toLowerCase()
+        if (!cleanVal) return
+
+        if (tags.length >= 3) {
+            // Visual feedback already handled by disabled state, but safety check
+            return
+        }
+
         setSubmitting(true)
 
         // Optimistic update
         const tempId = Math.random().toString()
         const newTag: UserTag = {
             id: tempId,
-            tag_text: inputValue.trim().toLowerCase(),
+            tag_text: cleanVal,
             is_public: isPublic
         }
         setTags(prev => [...prev, newTag])
@@ -58,6 +72,7 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
             console.error(res.error)
         } else {
             await fetchTags() // Refresh true ID
+            fetchSuggestions() // Update list
         }
 
         setSubmitting(false)
@@ -72,15 +87,17 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
         }
     }
 
+    const limitReached = tags.length >= 3
+
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h4 className="text-sm font-semibold flex items-center gap-2">
                     <Tag className="w-4 h-4 text-primary" />
-                    Your Tags
+                    Your Tags <span className="text-[10px] uppercase font-normal text-muted-foreground ml-1">(Private)</span>
                 </h4>
-                <span className="text-xs text-muted-foreground">
-                    {tags.length} / 50
+                <span className={cn("text-xs font-medium", limitReached ? "text-red-400" : "text-muted-foreground")}>
+                    {tags.length} / 3
                 </span>
             </div>
 
@@ -90,10 +107,14 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                        placeholder="Add private tag..."
+                        placeholder={limitReached ? "Limit reached (3 tags max)" : "Add private tag..."}
                         className="h-9 pr-8"
-                        disabled={submitting}
+                        disabled={submitting || limitReached}
+                        list="user-tags-suggestions"
                     />
+                    <datalist id="user-tags-suggestions">
+                        {suggestions.map(s => <option key={s} value={s} />)}
+                    </datalist>
                 </div>
 
                 <div className="flex items-center gap-2" title="Make tag public?">
@@ -102,12 +123,13 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
                         onCheckedChange={setIsPublic}
                         id="public-mode"
                         className="scale-75"
+                        disabled={limitReached}
                     />
                     <label htmlFor="public-mode" className="sr-only">Public</label>
                     {isPublic ? <Globe className="w-4 h-4 text-blue-400" /> : <Lock className="w-4 h-4 text-muted-foreground" />}
                 </div>
 
-                <Button size="sm" onClick={handleAdd} disabled={!inputValue.trim() || submitting}>
+                <Button size="sm" onClick={handleAdd} disabled={!inputValue.trim() || submitting || limitReached}>
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 </Button>
             </div>

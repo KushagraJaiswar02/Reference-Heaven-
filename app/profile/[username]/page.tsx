@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Globe, Instagram, Twitter, Palette, Linkedin, Youtube } from "lucide-react"
 import { notFound } from "next/navigation"
 import { ProfileSettings } from "@/components/profile/ProfileSettings"
+import { getUserTagSummary } from "@/app/actions/tagging/user"
+import { YourTagsProfileSection } from "@/components/profile/YourTagsProfileSection"
 
 interface Props {
     params: Promise<{
@@ -57,6 +59,13 @@ export default async function ProfilePage({ params }: Props) {
     }
 
     const isOwner = currentUser && currentUser.id === profile.id
+    console.log("[ProfileDebug] CurrentUser:", currentUser?.id)
+    console.log("[ProfileDebug] ProfileOwner:", profile.id)
+    console.log("[ProfileDebug] IsOwner:", isOwner)
+
+    // Fetch personal tags if owner
+    const personalTags = isOwner ? await getUserTagSummary(currentUser.id) : []
+    console.log("[ProfileDebug] PersonalTags Count:", personalTags.length)
 
     // 2. Fetch Portfolio (Uploads)
     const { data: images, error: imagesError } = await supabase
@@ -81,9 +90,9 @@ export default async function ProfilePage({ params }: Props) {
         <div className="min-h-screen bg-zinc-950 text-white pt-24 px-4 md:px-8">
             {/* Header Section */}
             <div className="max-w-7xl mx-auto mb-16">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                <div className="flex flex-col md:flex-row items-center md:items-start md:items-stretch gap-8">
                     {/* Avatar */}
-                    <Avatar className="w-32 h-32 border-4 border-zinc-900 shadow-2xl">
+                    <Avatar className="w-32 h-32 border-4 border-zinc-900 shadow-2xl flex-shrink-0">
                         <AvatarImage src={profile.avatar_url} className="object-cover" />
                         <AvatarFallback className="bg-zinc-800 text-3xl font-bold text-zinc-500">
                             {profile.username[0]?.toUpperCase()}
@@ -91,19 +100,21 @@ export default async function ProfilePage({ params }: Props) {
                     </Avatar>
 
                     {/* Info */}
-                    <div className="flex-1 text-center md:text-left space-y-6">
-                        <div className="space-y-2">
-                            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
-                                {profile.username}
-                            </h1>
-                            {profile.bio && (
-                                <p className="text-zinc-400 max-w-2xl text-lg leading-relaxed">
-                                    {profile.bio}
-                                </p>
-                            )}
+                    <div className="flex-1 text-center md:text-left space-y-6 flex flex-col">
+                        <div className="space-y-4">
+                            <div>
+                                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">
+                                    {profile.username}
+                                </h1>
+                                {profile.bio && (
+                                    <p className="text-zinc-400 max-w-2xl text-lg leading-relaxed">
+                                        {profile.bio}
+                                    </p>
+                                )}
+                            </div>
 
                             {/* Social Links */}
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                                 {profile.website && (
                                     <a
                                         href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
@@ -186,7 +197,7 @@ export default async function ProfilePage({ params }: Props) {
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
+                        <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start mt-auto">
                             {isOwner ? (
                                 <>
                                     <ProfileSettings profile={profile} />
@@ -203,6 +214,13 @@ export default async function ProfilePage({ params }: Props) {
                             )}
                         </div>
                     </div>
+
+                    {/* Right Column: Personal Tags (Owner Only) */}
+                    {isOwner && (
+                        <div className="w-full md:w-80 flex-shrink-0">
+                            <YourTagsProfileSection tags={personalTags} />
+                        </div>
+                    )}
                 </div>
             </div>
 
