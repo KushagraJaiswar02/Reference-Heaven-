@@ -44,8 +44,27 @@ export function PostCard({ image }: PostCardProps) {
                 {/* Overlay Feedback */}
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                     <div className="w-full">
+                        <div className="flex items-center gap-2 mb-1">
+                            {image.author?.avatar_url && (
+                                <Image
+                                    src={image.author.avatar_url}
+                                    alt={image.author.username}
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full w-5 h-5 bg-zinc-800"
+                                />
+                            )}
+                            <span className="text-xs text-white/90 font-medium truncate">{image.author?.username}</span>
+                        </div>
                         <p className="font-semibold text-white text-sm truncate">{image.title}</p>
-                        {image.topic && <p className="text-xs text-white/80">{image.topic}</p>}
+                        <div className="flex justify-between items-center mt-1">
+                            {image.topic && <p className="text-[10px] text-white/60 uppercase tracking-wider">{image.topic}</p>}
+                            {image.stats && (
+                                <span className="text-[10px] text-white/80 flex items-center gap-1">
+                                    ❤️ {image.stats.likes_count}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,15 @@ export type ImageCardDTO = {
     url: string
     title: string
     topic: string | null
-    // Add aspect ratio or dimensions if available in DB, otherwise assume masonry handles it.
+    author: {
+        id: string
+        username: string
+        avatar_url: string
+    }
+    stats: {
+        likes_count: number
+    }
+    // Minimal for list view
 }
 
 export type ImageDetailDTO = {
