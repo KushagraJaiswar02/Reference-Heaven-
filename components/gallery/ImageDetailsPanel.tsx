@@ -32,11 +32,26 @@ interface ImageDetailsPanelProps {
     currentUser: any
     currentUserId?: string
     isSaved: boolean
+    // SSR Data
+    initialCanonicalTags: any[]
+    initialAuthorTags: any[]
+    initialCommunityTags: any[]
+    initialUserTags: any[]
 }
 
-export function ImageDetailsPanel({ image: initialImage, currentUser, currentUserId, isSaved }: ImageDetailsPanelProps) {
+export function ImageDetailsPanel({
+    image,
+    currentUser,
+    currentUserId,
+    isSaved: initialIsSaved,
+    initialCanonicalTags,
+    initialAuthorTags,
+    initialCommunityTags,
+    initialUserTags
+}: ImageDetailsPanelProps) {
     const router = useRouter()
-    const [image, setImage] = useState(initialImage)
+    const [isSaved, setIsSaved] = useState(initialIsSaved)
+    const [saving, setSaving] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const [editLoading, setEditLoading] = useState(false)
 
@@ -302,6 +317,10 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, currentUse
                                 imageId={image.id}
                                 artistId={image.artist_id}
                                 currentUserId={currentUserId}
+                                initialCanonicalTags={initialCanonicalTags}
+                                initialAuthorTags={initialAuthorTags}
+                                initialCommunityTags={initialCommunityTags}
+                                initialUserTags={initialUserTags}
                             />
                         </div>
                     </div>

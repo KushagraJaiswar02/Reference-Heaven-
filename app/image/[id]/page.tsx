@@ -5,38 +5,27 @@ import { notFound } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { ImageDetailsPanel } from "@/components/gallery/ImageDetailsPanel"
-// ... imports
-// Removed getTagsByImage import as we do it in the component now
+import { getPublicImageDetails, getUserImageContext } from "@/app/data/image"
 
 export default async function ImagePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
 
-    const { data: image, error } = await supabase
-        .from("images")
-        .select("*, profiles(*)")
-        .eq("id", id)
-        .single()
+    // Fetch Data in Parallel (SSR)
+    const [publicData, userContext] = await Promise.all([
+        getPublicImageDetails(id),
+        getUserImageContext(id)
+    ])
 
-    if (error || !image) {
-        console.error("Error fetching image:", error)
+    if (!publicData) {
         return notFound()
     }
 
-    let isSaved = false
-    if (user) {
-        const { data: save } = await supabase
-            .from('saves')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('image_id', id)
-            .single()
-        isSaved = !!save
-    }
+    const { image, canonicalTags, authorTags, communityTags } = publicData
+    const { isSaved, userTags } = userContext
 
-    // Legacy tags no longer needed here as ImageTagsDisplay handles data fetching independently
-    // const { tags } = await getTagsByImage(id)
+    // Get current user for ID passing
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
     return (
         <div className="container mx-auto px-4 py-8 flex flex-col items-center">
@@ -63,11 +52,15 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
                 </div>
 
                 <ImageDetailsPanel
-                    image={image as any}
+                    image={image}
                     currentUser={user}
                     currentUserId={user?.id}
                     isSaved={isSaved}
-                // legacy tags prop removed
+                    // Initial Data for SSR (No waterfalls)
+                    initialCanonicalTags={canonicalTags}
+                    initialAuthorTags={authorTags}
+                    initialCommunityTags={communityTags}
+                    initialUserTags={userTags}
                 />
             </div>
         </div>

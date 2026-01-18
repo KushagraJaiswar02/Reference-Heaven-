@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
 
 interface UserTagManagerProps {
     imageId: string
+    initialTags: any[]
 }
 
 type UserTag = {
@@ -19,18 +20,18 @@ type UserTag = {
     is_public: boolean
 }
 
-export function UserTagManager({ imageId }: UserTagManagerProps) {
-    const [tags, setTags] = useState<UserTag[]>([])
-    const [loading, setLoading] = useState(true)
+export function UserTagManager({ imageId, initialTags }: UserTagManagerProps) {
+    const [tags, setTags] = useState<UserTag[]>(initialTags)
+    // Removed loading state since we have initial data
     const [inputValue, setInputValue] = useState("")
     const [isPublic, setIsPublic] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [suggestions, setSuggestions] = useState<string[]>([])
 
+    // Refetch logic remains for after-mutation sync
     const fetchTags = async () => {
         const data = await getUserTags(imageId)
         setTags(data)
-        setLoading(false)
     }
 
     const fetchSuggestions = async () => {
@@ -39,9 +40,9 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
     }
 
     useEffect(() => {
-        fetchTags()
+        // Only fetch suggestions on mount, tags are already here!
         fetchSuggestions()
-    }, [imageId])
+    }, [])
 
     const handleAdd = async () => {
         const cleanVal = inputValue.trim().toLowerCase()
@@ -135,9 +136,7 @@ export function UserTagManager({ imageId }: UserTagManagerProps) {
             </div>
 
             <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                {loading ? (
-                    <span className="text-xs text-muted-foreground animate-pulse">Loading tags...</span>
-                ) : tags.length === 0 ? (
+                {tags.length === 0 ? (
                     <span className="text-xs text-muted-foreground italic">No personal tags yet.</span>
                 ) : (
                     tags.map(tag => (

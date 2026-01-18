@@ -12,44 +12,35 @@ import { Sparkles, Globe, ShieldCheck } from "lucide-react"
 
 interface ImageTagsDisplayProps {
     imageId: string
-    artistId: string // To identify author
+    artistId: string
     currentUserId?: string
+    // SSR Props
+    initialCanonicalTags: any[]
+    initialAuthorTags: any[]
+    initialCommunityTags: any[]
+    initialUserTags: any[]
 }
 
-export function ImageTagsDisplay({ imageId, artistId, currentUserId }: ImageTagsDisplayProps) {
-    const [canonicalTags, setCanonicalTags] = useState<any[]>([])
-    const [authorTags, setAuthorTags] = useState<any[]>([])
-    const [communityTags, setCommunityTags] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
+export function ImageTagsDisplay({
+    imageId,
+    artistId,
+    currentUserId,
+    initialCanonicalTags,
+    initialAuthorTags,
+    initialCommunityTags,
+    initialUserTags
+}: ImageTagsDisplayProps) {
+    // We can use state if we want to support updates, or just use props if read-only
+    // But since UserTagManager handles updates, passing initial data down is key.
 
-    useEffect(() => {
-        async function loadData() {
-            const [cTags, aTags, pubTags] = await Promise.all([
-                getImageCanonicalTags(imageId),
-                getAuthorTags(imageId),
-                getPublicCommunityTags(imageId)
-            ])
+    // For this refactor, we remove the client-side fetch entirely!
+    const canonicalTags = initialCanonicalTags
+    const authorTags = initialAuthorTags
+    const communityTags = initialCommunityTags
 
-            setCanonicalTags(cTags || [])
-            setAuthorTags(aTags || [])
-            setCommunityTags(pubTags || [])
-            setLoading(false)
-        }
+    // No useEffect fetching! 
+    // Data is ready on mount.
 
-        loadData()
-    }, [imageId])
-
-    if (loading) {
-        return (
-            <div className="space-y-4 pt-4">
-                <Skeleton className="h-6 w-32" />
-                <div className="flex gap-2">
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-6 w-16" />
-                </div>
-            </div>
-        )
-    }
 
     return (
         <div className="space-y-6 pt-4">
@@ -92,7 +83,7 @@ export function ImageTagsDisplay({ imageId, artistId, currentUserId }: ImageTags
             <Separator />
 
             {/* 3. User Personal Tags (Private) */}
-            <UserTagManager imageId={imageId} />
+            <UserTagManager imageId={imageId} initialTags={initialUserTags} />
 
             {/* 4. Community Tags (Public Aggregate) */}
             {communityTags.length > 0 && (

@@ -20,14 +20,21 @@ export function MasonryGrid({ images }: MasonryGridProps) {
     return (
         <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4 space-y-4 p-4">
             {images.map((image) => (
-                <Link key={image.id} href={`/image/${image.id}`} scroll={false}>
-                    <div className="relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer break-inside-avoid group mb-4">
+                <Link
+                    key={image.id}
+                    href={`/image/${image.id}`}
+                    scroll={false}
+                    prefetch={true}
+                    className="block"
+                >
+                    <div className="relative overflow-hidden rounded-lg hover:opacity-90 active:scale-95 active:opacity-80 transition-all duration-75 cursor-pointer break-inside-avoid group mb-4 backface-visibility-hidden transform-gpu">
                         <Image
                             src={image.url}
                             alt={image.title}
                             width={600}
                             height={400}
                             className="w-full h-auto object-cover rounded-lg bg-muted"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                             <div>
