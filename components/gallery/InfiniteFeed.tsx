@@ -10,9 +10,14 @@ import { Skeleton } from "@/components/ui/skeleton"
 interface InfiniteFeedProps {
     initialItems: ImageCardDTO[]
     initialNextCursor: string | null
+    fetchNextPage: (cursor: string) => Promise<{
+        items: ImageCardDTO[],
+        nextCursor: string | null,
+        hasMore: boolean
+    }>
 }
 
-export function InfiniteFeed({ initialItems, initialNextCursor }: InfiniteFeedProps) {
+export function InfiniteFeed({ initialItems, initialNextCursor, fetchNextPage }: InfiniteFeedProps) {
     const [items, setItems] = useState<ImageCardDTO[]>(initialItems)
     const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor)
     const [loading, setLoading] = useState(false)
@@ -28,7 +33,7 @@ export function InfiniteFeed({ initialItems, initialNextCursor }: InfiniteFeedPr
 
         setLoading(true)
         try {
-            const res = await getPaginatedFeed(nextCursor)
+            const res = await fetchNextPage(nextCursor)
 
             // Append new items
             setItems((prev) => [...prev, ...res.items])

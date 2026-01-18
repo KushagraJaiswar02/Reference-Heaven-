@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Menu, X, Bookmark } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
+import { GlobalSearchInput } from "./GlobalSearchInput"
 import { UserNav } from "./UserNav"
 import { UploadModal } from "@/components/gallery/UploadModal"
 import { Toaster } from "@/components/ui/sonner"
@@ -107,12 +108,8 @@ export function Navbar() {
 
                     {/* Center: Search */}
                     <div className="flex-1 flex justify-center max-w-lg mx-auto md:px-8">
-                        <div className="relative w-full hidden md:block group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 group-hover:text-zinc-400 transition-colors" />
-                            <Input
-                                placeholder="Search references..."
-                                className="bg-white/5 border-none text-white pl-11 h-10 w-full rounded-full focus-visible:ring-1 focus-visible:ring-white/20 placeholder:text-zinc-600 transition-all hover:bg-white/10"
-                            />
+                        <div className="w-full hidden md:block">
+                            <GlobalSearchInput />
                         </div>
                     </div>
 
@@ -180,11 +177,7 @@ export function Navbar() {
             )}>
                 <div className="flex flex-col gap-6 text-lg font-medium">
                     <div className="relative w-full">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
-                        <Input
-                            placeholder="Search references..."
-                            className="bg-white/5 border-none text-white pl-12 h-12 w-full rounded-xl focus-visible:ring-1 focus-visible:ring-white/20 placeholder:text-zinc-600"
-                        />
+                        <GlobalSearchInput />
                     </div>
                     <Link
                         href="/"
