@@ -121,10 +121,23 @@ export async function searchImages(request: SearchRequest) {
     if (resultIds.length === 0) return { items: [], nextCursor: null, hasMore: false }
 
     // Fetch Details for these IDs (preserving order?? In map we can)
-    let detailsQuery = supabase.from('images').select(`
+    // Fetch Details for these IDs (preserving order?? In map we can)
+    // Dynamic Select based on context
+    let selectString = `
         id, url, title, topic, likes_count, created_at,
         profiles (id, username, avatar_url)
-    `).in('id', resultIds)
+    `
+
+    if (context.type === 'saved') {
+        selectString += `, saves!inner(user_id)`
+    }
+
+    let detailsQuery: any = supabase.from('images').select(selectString).in('id', resultIds)
+
+    // Apply Context Filter
+    if (context.type === 'saved') {
+        detailsQuery = detailsQuery.eq('saves.user_id', context.userId)
+    }
 
     // Apply Filters (Post-Search constraint)
     if (filters.domain) detailsQuery = detailsQuery.eq('topic', filters.domain)
