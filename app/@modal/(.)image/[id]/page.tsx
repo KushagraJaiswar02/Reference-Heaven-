@@ -27,9 +27,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { getTagsByImage } from "@/app/actions/tags"
-import { TagInput } from "@/components/tags/TagInput"
-import { TagList } from "@/components/tags/TagList"
+// Removed legacy imports: getTagsByImage, TagInput, TagList
+import { ImageTagsDisplay } from "@/components/image/ImageTagsDisplay"
 
 export default function ImageModal({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
@@ -40,7 +39,7 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
     const [isEditing, setIsEditing] = useState(false)
     const [editLoading, setEditLoading] = useState(false)
     const [isSaved, setIsSaved] = useState(false)
-    const [tags, setTags] = useState<any[]>([])
+    // Removed legacy tags state
 
     // Edit Form State
     const [title, setTitle] = useState("")
@@ -65,8 +64,6 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
 
             // Fetch User
             const { data: { user } } = await supabase.auth.getUser()
-            console.log("Current User:", user)
-            console.log("Image Artist ID:", imageData?.artist_id)
             setCurrentUser(user)
 
             // Fetch Saved Status
@@ -78,12 +75,9 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                     .eq('image_id', imageData.id)
                     .single()
                 setIsSaved(!!save)
-                setIsSaved(!!save)
             }
 
-            // Fetch Tags
-            const { tags: fetchedTags } = await getTagsByImage(id)
-            setTags(fetchedTags || [])
+            // Legacy tag fetching removed
 
             setLoading(false)
         }
@@ -91,7 +85,6 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
     }, [id])
 
     const isOwner = currentUser && image && currentUser.id === image.artist_id
-    console.log("Is Owner:", isOwner)
 
     const handleDelete = async () => {
         if (!image) return
@@ -346,33 +339,13 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                                     )}
                                 </div>
 
-                                {/* Tags Section */}
+                                {/* NEW 3-Layer Tagging System Display */}
                                 <div className="space-y-4 pt-4 border-t border-white/5">
-                                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                                        Tags
-                                    </h3>
-
-                                    {tags.length > 0 ? (
-                                        <TagList
-                                            tags={tags}
-                                            currentUserId={currentUser?.id}
-                                            imageOwnerId={image.artist_id}
-                                        />
-                                    ) : (
-                                        <p className="text-xs text-zinc-500 italic">No tags added yet.</p>
-                                    )}
-
-                                    {currentUser && (
-                                        <div className="pt-2">
-                                            <TagInput
-                                                imageId={image.id}
-                                                onTagAdded={async () => {
-                                                    const { tags: newTags } = await getTagsByImage(image.id)
-                                                    setTags(newTags || [])
-                                                }}
-                                            />
-                                        </div>
-                                    )}
+                                    <ImageTagsDisplay
+                                        imageId={image.id}
+                                        artistId={image.artist_id}
+                                        currentUserId={currentUser?.id}
+                                    />
                                 </div>
                             </div>
 
@@ -386,8 +359,6 @@ export default function ImageModal({ params }: { params: Promise<{ id: string }>
                                     <Maximize2 className="w-4 h-4 mr-2" />
                                     Open Full Page
                                 </Button>
-
-
                             </div>
                         </div>
                     </>

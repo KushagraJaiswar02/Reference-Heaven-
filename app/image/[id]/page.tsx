@@ -5,7 +5,8 @@ import { notFound } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { ImageDetailsPanel } from "@/components/gallery/ImageDetailsPanel"
-import { getTagsByImage } from "@/app/actions/tags"
+// ... imports
+// Removed getTagsByImage import as we do it in the component now
 
 export default async function ImagePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -32,10 +33,10 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
             .eq('image_id', id)
             .single()
         isSaved = !!save
-        isSaved = !!save
     }
 
-    const { tags } = await getTagsByImage(id)
+    // Legacy tags no longer needed here as ImageTagsDisplay handles data fetching independently
+    // const { tags } = await getTagsByImage(id)
 
     return (
         <div className="container mx-auto px-4 py-8 flex flex-col items-center">
@@ -61,7 +62,13 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
                     </div>
                 </div>
 
-                <ImageDetailsPanel image={image as any} currentUser={user} isSaved={isSaved} tags={tags} />
+                <ImageDetailsPanel
+                    image={image as any}
+                    currentUser={user}
+                    currentUserId={user?.id}
+                    isSaved={isSaved}
+                // legacy tags prop removed
+                />
             </div>
         </div>
     )

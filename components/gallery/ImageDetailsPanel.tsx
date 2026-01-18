@@ -23,19 +23,18 @@ import { Share2, Pencil, Trash2, X, Hash, Zap, Box, Copy } from "lucide-react"
 import { toast } from "sonner"
 import { deleteImage } from "@/app/actions/deleteImage"
 import { updateImage } from "@/app/actions/updateImage"
-import { Image as ImageType } from "@/types" // Ensure this type exists or use 'any' temporarily if unsure
+import { Image as ImageType } from "@/types"
 import { SaveButton } from "@/components/SaveButton"
-import { TagInput } from "@/components/tags/TagInput"
-import { TagList } from "@/components/tags/TagList"
+import { ImageTagsDisplay } from "@/components/image/ImageTagsDisplay"
 
 interface ImageDetailsPanelProps {
-    image: ImageType & { profiles: any } // Adjust type as needed
+    image: ImageType & { profiles: any }
     currentUser: any
+    currentUserId?: string
     isSaved: boolean
-    tags?: any[]
 }
 
-export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, tags: initialTags = [] }: ImageDetailsPanelProps) {
+export function ImageDetailsPanel({ image: initialImage, currentUser, currentUserId, isSaved }: ImageDetailsPanelProps) {
     const router = useRouter()
     const [image, setImage] = useState(initialImage)
     const [isEditing, setIsEditing] = useState(false)
@@ -51,27 +50,10 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
     const handleDelete = async () => {
         try {
             await deleteImage(image.id)
-            // If we get here, the action didn't redirect (e.g. error but not thrown, or client handling)
-            // But deleteImage DOES redirect on success, which throws an error we catch below.
-            // If it returns an object {error: ...}, we handle it.
-            // Wait, if it redirects, it throws. So verify what deleteImage returns.
-            // It returns {error} on failure. On success, it calls `redirect` which THROWS.
-            // So we won't reach here on success.
         } catch (error: any) {
-            if (error.message === "NEXT_REDIRECT") {
-                // This is a redirect, so it was successful.
+            if (error.message === "NEXT_REDIRECT" || error.digest?.startsWith('NEXT_REDIRECT')) {
                 toast.success("Image deleted successfully")
-                // Let the redirect happen (propagate it? No, client-side let's just allow it or manually nav)
-                // Actually if we catch it, we stop the navigation.
-                // We shouldn't catch it.
                 throw error
-            }
-            // Real error?
-            // Since deleteImage is a Server Action that returns {error} on handled errors, 
-            // the only throw should be Redirect or unexpected.
-            // We can assume if it's not a redirect, it's an error.
-            if (error.digest?.startsWith('NEXT_REDIRECT')) {
-                throw error;
             }
             toast.error("An error occurred")
         }
@@ -102,6 +84,7 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
             setEditLoading(false)
         }
     }
+
     const handleCopyColor = (color: string) => {
         navigator.clipboard.writeText(color)
         toast.success(`Color ${color} copied to clipboard`)
@@ -109,7 +92,7 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
 
     return (
         <div className="fixed right-6 top-6 bottom-6 w-[420px] flex flex-col bg-zinc-950/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden">
-            {/* Header Actions - Minimal & Glassy */}
+            {/* Header Actions */}
             <div className="p-5 flex items-center justify-between border-b border-white/5 bg-white/5 backdrop-blur-3xl sticky top-0 z-10">
                 <div className="flex gap-2">
                     <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-transparent hover:bg-white/10 text-zinc-400 hover:text-white transition-all">
@@ -168,6 +151,7 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
             <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
                 {isEditing ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+                        {/* Edit Form */}
                         <div className="space-y-4">
                             <Label htmlFor="title" className="text-zinc-500 text-[11px] uppercase tracking-widest font-bold ml-1">Title</Label>
                             <Input
@@ -230,7 +214,7 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
                             )}
                         </div>
 
-                        {/* Artist Profile - Glassmorphic */}
+                        {/* Artist Profile */}
                         <Link href={`/profile/${image.profiles?.username}`} className="block">
                             <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5 backdrop-blur-md hover:bg-white/[0.06] transition-all cursor-pointer group shadow-lg shadow-black/20">
                                 <Avatar className="w-10 h-10 ring-2 ring-white/10 group-hover:ring-indigo-500/50 transition-all">
@@ -249,7 +233,7 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
 
                         <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
 
-                        {/* Metadata / Tags - Modern Grid */}
+                        {/* Metadata */}
                         <div className="space-y-6">
                             {(image.topic || image.lighting_style || image.perspective_angle) && (
                                 <div className="space-y-4">
@@ -293,7 +277,6 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
                                     <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 pl-1">
                                         Palette
                                     </h3>
-                                    {/* Horizontal Scroll Palette */}
                                     <div className="flex overflow-x-auto gap-3 pb-4 pt-1 px-1 -mx-1 scrollbar-hide mask-fade-right">
                                         {image.color_palette.map((color: string, i: number) => (
                                             <button
@@ -313,27 +296,13 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
                             )}
                         </div>
 
-                        {/* Manual Tags Section */}
-                        <div className="space-y-4 pt-4 border-t border-white/5">
-                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 pl-1">
-                                Tags
-                            </h3>
-
-                            {initialTags.length > 0 ? (
-                                <TagList
-                                    tags={initialTags}
-                                    currentUserId={currentUser?.id}
-                                    imageOwnerId={initialImage.artist_id}
-                                />
-                            ) : (
-                                <p className="text-xs text-zinc-500 italic pl-1">No tags added yet.</p>
-                            )}
-
-                            {currentUser && (
-                                <div className="pt-2">
-                                    <TagInput imageId={initialImage.id} />
-                                </div>
-                            )}
+                        {/* 3-Layer Tagging System */}
+                        <div className="pt-2 border-t border-white/5">
+                            <ImageTagsDisplay
+                                imageId={image.id}
+                                artistId={image.artist_id}
+                                currentUserId={currentUserId}
+                            />
                         </div>
                     </div>
                 )}
@@ -341,5 +310,3 @@ export function ImageDetailsPanel({ image: initialImage, currentUser, isSaved, t
         </div>
     )
 }
-
-
