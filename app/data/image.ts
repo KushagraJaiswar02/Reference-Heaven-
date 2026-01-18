@@ -3,20 +3,9 @@ import { cache } from "react"
 import { getImageCanonicalTags } from "@/app/actions/tagging/canonical"
 import { getAuthorTags } from "@/app/actions/tagging/author"
 import { getPublicCommunityTags } from "@/app/actions/tagging/user"
+import { ImageCardDTO, ImageDetailDTO, UserImageContextDTO } from "./dto"
 
-export type ImageDetailDTO = {
-    image: any
-    canonicalTags: any[]
-    authorTags: any[]
-    communityTags: any[]
-}
-
-export type UserImageContextDTO = {
-    isSaved: boolean
-    userTags: any[]
-}
-
-// Cached public data fetcher
+// Cached public data fetcher for DETAILS
 export const getPublicImageDetails = cache(async (imageId: string): Promise<ImageDetailDTO | null> => {
     const supabase = await createClient()
 
@@ -40,7 +29,7 @@ export const getPublicImageDetails = cache(async (imageId: string): Promise<Imag
     }
 })
 
-// Uncached user-specific data fetcher
+// Uncached user-specific data fetcher for DETAILS
 export const getUserImageContext = async (imageId: string): Promise<UserImageContextDTO> => {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -60,3 +49,20 @@ export const getUserImageContext = async (imageId: string): Promise<UserImageCon
         userTags: userTagsRes.data || []
     }
 }
+
+// Lightweight Feed Fetcher (Public, Cached)
+export const getFeedImages = cache(async (): Promise<ImageCardDTO[]> => {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+        .from('images')
+        .select('id, url, title, topic') // EXPLICIT SELECTION
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error("Feed fetch error:", error)
+        return []
+    }
+
+    return data as ImageCardDTO[]
+})

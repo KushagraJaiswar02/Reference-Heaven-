@@ -1,6 +1,3 @@
-'use client'
-
-import { useEffect, useState } from "react"
 import { getImageCanonicalTags } from "@/app/actions/tagging/canonical"
 import { getAuthorTags } from "@/app/actions/tagging/author"
 import { getPublicCommunityTags } from "@/app/actions/tagging/user"
@@ -54,7 +51,7 @@ export function ImageTagsDisplay({
                     </h4>
                     <div className="flex flex-wrap gap-2">
                         {canonicalTags.map((tag: any) => (
-                            <Badge key={tag.tag_id} variant="secondary" className="px-2.5 py-1 text-xs font-medium bg-secondary/50 hover:bg-secondary">
+                            <Badge key={tag.id} variant="secondary" className="px-2.5 py-1 text-xs font-medium bg-secondary/50 hover:bg-secondary">
                                 <span className="opacity-50 mr-1.5 font-normal capitalize">{tag.category}:</span>
                                 {tag.name}
                             </Badge>

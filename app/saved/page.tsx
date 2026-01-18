@@ -3,6 +3,7 @@ import { MasonryGrid } from "@/components/gallery/MasonryGrid"
 import { redirect } from "next/navigation"
 import { X, Tag } from "lucide-react"
 import Link from "next/link"
+import { ImageCardDTO } from "@/app/data/dto"
 
 interface SavedPageProps {
     searchParams: Promise<{
@@ -24,36 +25,30 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
         .select(`
             image_id,
             images (
-                *,
-                profiles (
-                    username,
-                    avatar_url
-                )
+                id,
+                url,
+                title,
+                topic
             )
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-    // If tag is present, we need to filter.
-    // Since 'saves' doesn't directly link to 'user_tags', checking this is tricky in one simple query query builder without 'filter/not.is'.
-    // Approach: Fetch IDs of images that have this tag for this user, then filter the saves query.
-    // Or better: Invert logic? Fetch user_tags then fetch images? 
-    // But we need to make sure they are 'saved' (although usually user tags imply interest, they might define 'saved' strictly).
-    // Let's use the ID filter approach for simplicity and correctness with RLS.
-
+    // Filter by tag if present
     let imageIdsToKeep: string[] | null = null
-
     if (tag) {
-        const { data: taggedImages, error: tagError } = await supabase
+        const { data: tagM } = await supabase
             .from('user_tags')
             .select('image_id')
             .eq('user_id', user.id)
-            .eq('tag_text', tag.toLowerCase())
+            .eq('tag_text', tag)
 
-        if (!tagError && taggedImages) {
-            imageIdsToKeep = taggedImages.map(t => t.image_id)
+        if (tagM) {
+            imageIdsToKeep = tagM.map(t => t.image_id)
         }
     }
+
+    // Main Query
 
     // Apply filter if we successfully resolved IDs
     if (tag && imageIdsToKeep) {
@@ -77,8 +72,8 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
     }
 
     const savedImages = saves
-        ?.map(save => save.images)
-        .filter(img => img !== null) as any[] || []
+        ?.map((save: any) => save.images)
+        .filter((img: any) => img !== null) as ImageCardDTO[] || []
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white pt-24 px-4 md:px-8">

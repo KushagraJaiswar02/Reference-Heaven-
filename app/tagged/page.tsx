@@ -3,6 +3,7 @@ import { MasonryGrid } from "@/components/gallery/MasonryGrid"
 import { redirect } from "next/navigation"
 import { X, Tag } from "lucide-react"
 import Link from "next/link"
+import { ImageCardDTO } from "@/app/data/dto"
 
 interface TaggedPageProps {
     searchParams: Promise<{
@@ -31,11 +32,10 @@ export default async function TaggedPage({ searchParams }: TaggedPageProps) {
         .select(`
             image_id,
             images (
-                *,
-                profiles (
-                    username,
-                    avatar_url
-                )
+                id,
+                url,
+                title,
+                topic
             )
         `)
         .eq('user_id', user.id)
@@ -53,8 +53,8 @@ export default async function TaggedPage({ searchParams }: TaggedPageProps) {
 
     // Transform data: extract the nested 'images' object
     const images = taggedItems
-        ?.map(item => item.images)
-        .filter(img => img !== null) as any[] || []
+        ?.map((item: any) => item.images)
+        .filter((img: any) => img !== null) as ImageCardDTO[] || []
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white pt-24 px-4 md:px-8">

@@ -131,6 +131,7 @@ export function ImageModalClient({
                             className="object-contain"
                             priority
                             quality={100}
+                            sizes="(max-width: 768px) 100vw, calc(100vw - 400px)"
                         />
                     </div>
                 </div>

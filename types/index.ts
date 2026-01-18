@@ -3,18 +3,18 @@ export interface Image {
     id: string
     created_at: string
     title: string
-    description?: string
+    description?: string | null
     url: string
-    width?: number
-    height?: number
+    width?: number | null
+    height?: number | null
     artist_id: string
-    topic?: string
+    topic?: string | null
     likes_count: number
-    lighting_style?: string
-    perspective_angle?: string
-    color_palette?: string[]
+    lighting_style?: string | null
+    perspective_angle?: string | null
+    color_palette?: string[] | null
     profiles?: {
         username: string
         avatar_url: string
-    }
+    } | null
 }
