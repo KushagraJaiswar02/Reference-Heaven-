@@ -10,6 +10,8 @@ export type CreateImageDTO = {
     topic: string;
     description?: string;
     imageUrl: string;
+    width?: number; // New
+    height?: number; // New
     sourceType: 'uploaded_cdn' | 'external_url';
     sourceMetadata?: any;
     colorPalette?: string[];
@@ -40,6 +42,8 @@ export async function createImageReference(data: CreateImageDTO) {
             topic: data.topic,
             description: data.description,
             url: data.imageUrl,
+            width: data.width || 1000,
+            height: data.height || 1000,
             source_type: data.sourceType,
             source_metadata: data.sourceMetadata || {},
             artist_id: user.id,

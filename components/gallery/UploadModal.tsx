@@ -119,6 +119,9 @@ export function UploadModal() {
             let finalImageUrl = externalUrl
             let finalMetadata = {}
 
+            let finalWidth = 1000
+            let finalHeight = 1000
+
             if (tab === 'upload') {
                 if (!file) {
                     toast.error("No file selected")
@@ -136,6 +139,16 @@ export function UploadModal() {
 
                 finalImageUrl = cdnResponse.secure_url
                 finalMetadata = cdnResponse
+
+                // Extract dimensions
+                if (cdnResponse.width && cdnResponse.height) {
+                    finalWidth = cdnResponse.width
+                    finalHeight = cdnResponse.height
+                }
+            } else {
+                // Convert previewUrl to image to get dimensions? 
+                // For now, let's rely on defaults or maybe try to get it if possible? 
+                // Simpler: Just rely on default 1000x1000 for external links unless we implement a meta-fetcher.
             }
 
             // 3. Save Reference
@@ -148,6 +161,8 @@ export function UploadModal() {
                 topic,
                 description,
                 imageUrl: finalImageUrl,
+                width: finalWidth,
+                height: finalHeight,
                 sourceType: tab === 'upload' ? 'uploaded_cdn' : 'external_url',
                 sourceMetadata: finalMetadata,
                 colorPalette,

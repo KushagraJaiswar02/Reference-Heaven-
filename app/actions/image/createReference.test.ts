@@ -55,6 +55,8 @@ describe('createImageReference', () => {
             title: 'Test Image',
             topic: 'Testing',
             imageUrl: 'https://cdn.example.com/img.jpg',
+            width: 1920,
+            height: 1080,
             sourceType: 'uploaded_cdn',
             sourceMetadata: { public_id: '123' },
             colorPalette: ['#ffffff'],
@@ -70,6 +72,8 @@ describe('createImageReference', () => {
         expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({
             title: 'Test Image',
             url: 'https://cdn.example.com/img.jpg',
+            width: 1920,
+            height: 1080,
             artist_id: 'test-user-id',
             source_type: 'uploaded_cdn'
         }))
