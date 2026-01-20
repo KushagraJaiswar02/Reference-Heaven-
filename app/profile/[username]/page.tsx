@@ -9,6 +9,8 @@ import { notFound } from "next/navigation"
 import { ProfileSettings } from "@/components/profile/ProfileSettings"
 import { getUserTagSummary } from "@/app/actions/tagging/user"
 import { YourTagsProfileSection } from "@/components/profile/YourTagsProfileSection"
+import { getGridThumbnailUrl } from "@/lib/image-optim"
+import { ImageCardDTO } from "@/app/data/dto"
 
 interface Props {
     params: Promise<{
@@ -84,7 +86,24 @@ export default async function ProfilePage({ params }: Props) {
         console.error("Error fetching images:", imagesError)
     }
 
-    const totalUploads = images?.length || 0
+    // Transform to ImageCardDTO
+    const feedImages: ImageCardDTO[] = (images || []).map((img) => ({
+        id: img.id,
+        url: img.url,
+        thumbnailUrl: getGridThumbnailUrl(img.url),
+        aspectRatio: (img.width && img.height) ? (img.width / img.height) : 1, // Fallback if 0/null
+        title: img.title,
+        author: {
+            id: img.profiles?.id || 'unknown',
+            username: img.profiles?.username || 'Unknown',
+            avatar_url: img.profiles?.avatar_url || ''
+        },
+        stats: {
+            likes_count: img.likes_count || 0
+        }
+    }))
+
+    const totalUploads = feedImages.length || 0
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white pt-24 px-4 md:px-8">
@@ -235,8 +254,8 @@ export default async function ProfilePage({ params }: Props) {
                     </span>
                 </div>
 
-                {images && images.length > 0 ? (
-                    <MasonryGrid images={images} />
+                {feedImages && feedImages.length > 0 ? (
+                    <MasonryGrid images={feedImages} />
                 ) : (
                     <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
                         <p className="text-lg">No work uploaded yet.</p>

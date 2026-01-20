@@ -1,9 +1,11 @@
+
 import { createClient } from "@/utils/supabase/server"
 import { MasonryGrid } from "@/components/gallery/MasonryGrid"
 import { redirect } from "next/navigation"
 import { X, Tag } from "lucide-react"
 import Link from "next/link"
 import { ImageCardDTO } from "@/app/data/dto"
+import { getGridThumbnailUrl } from "@/lib/image-optim"
 
 interface SavedPageProps {
     searchParams: Promise<{
@@ -28,7 +30,15 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
                 id,
                 url,
                 title,
-                topic
+                topic,
+                width,
+                height,
+                artist_id,
+                likes_count,
+                 profiles:artist_id (
+                    username,
+                    avatar_url
+                 )
             )
         `)
         .eq('user_id', user.id)
@@ -47,8 +57,6 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
             imageIdsToKeep = tagM.map(t => t.image_id)
         }
     }
-
-    // Main Query
 
     // Apply filter if we successfully resolved IDs
     if (tag && imageIdsToKeep) {
@@ -71,9 +79,22 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
         )
     }
 
-    const savedImages = saves
-        ?.map((save: any) => save.images)
-        .filter((img: any) => img !== null) as ImageCardDTO[] || []
+    const savedImages: ImageCardDTO[] = (saves || [])
+        .map((save: any) => save.images)
+        .filter((img: any) => img !== null)
+        .map((img: any) => ({
+            id: img.id,
+            url: img.url,
+            thumbnailUrl: getGridThumbnailUrl(img.url),
+            aspectRatio: (img.width && img.height) ? (img.width / img.height) : 1,
+            title: img.title,
+            author: {
+                id: img.profiles?.id || 'unknown',
+                username: img.profiles?.username || 'Unknown',
+                avatar_url: img.profiles?.avatar_url || ''
+            },
+            stats: { likes_count: img.likes_count || 0 }
+        }))
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white pt-24 px-4 md:px-8">
