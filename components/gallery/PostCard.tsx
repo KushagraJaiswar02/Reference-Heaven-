@@ -9,36 +9,36 @@ interface PostCardProps {
     image: ImageCardDTO
 }
 
+// ... imports
+// ... interface
+
 export function PostCard({ image }: PostCardProps) {
     const router = useRouter()
 
     const handleMouseEnter = () => {
-        // Explicit intent-based prefetch for faster desktop navigation
         router.prefetch(`/image/${image.id}`)
     }
 
+    // Pass thumbnail and dimensions to modal for instant open
+    const href = `/image/${image.id}?thumb=${encodeURIComponent(image.thumbnailUrl)}&ar=${image.aspectRatio}`
+
     return (
         <Link
-            href={`/image/${image.id}`}
+            href={href}
             scroll={false}
-            prefetch={true} // Next.js default viewport prefetching (Mobile/Desktop view)
+            prefetch={true}
             className="block group mb-4 break-inside-avoid relative"
-            onMouseEnter={handleMouseEnter} // Hover prefetching (Desktop intent)
+            onMouseEnter={handleMouseEnter}
         >
             <div className="relative overflow-hidden rounded-lg backface-visibility-hidden transform-gpu transition-all duration-75 active:scale-95 active:opacity-80">
-                {/* 
-                   Layout Stability:
-                   - Aspect ratio is determined by natural image dimensions + masonry layout.
-                   - 'sizes' ensures correct resource selection.
-                   - 'bg-muted' acts as immediate placeholder.
-                */}
                 <Image
-                    src={image.url}
+                    src={image.thumbnailUrl} // Use optimized thumbnail
                     alt={image.title}
-                    width={600}
-                    height={400}
+                    width={500} // Matches grid width assumption
+                    height={500 / image.aspectRatio}
                     className="w-full h-auto object-cover rounded-lg bg-muted"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={false}
                 />
 
                 {/* Overlay Feedback */}
@@ -58,7 +58,7 @@ export function PostCard({ image }: PostCardProps) {
                         </div>
                         <p className="font-semibold text-white text-sm truncate">{image.title}</p>
                         <div className="flex justify-between items-center mt-1">
-                            {image.topic && <p className="text-[10px] text-white/60 uppercase tracking-wider">{image.topic}</p>}
+                            {/* Topic removed from Grid DTO */}
                             {image.stats && (
                                 <span className="text-[10px] text-white/80 flex items-center gap-1">
                                     ❤️ {image.stats.likes_count}

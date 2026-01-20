@@ -1,19 +1,22 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Share2, Link as LinkIcon, MoreHorizontal, Maximize2, Pencil, Trash2, X } from "lucide-react"
 import { SaveButton } from "@/components/SaveButton"
-import { Image as ImageType } from "@/types"
 import { deleteImage } from "@/app/actions/deleteImage"
 import { updateImage } from "@/app/actions/updateImage"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import useSWR from "swr"
+import { getClientImageDetails } from "@/app/actions/image/getImageDetail"
+import { Skeleton } from "@/components/ui/skeleton"
+import { createClient } from "@/utils/supabase/client"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -28,50 +31,70 @@ import {
 import { ImageTagsDisplay } from "@/components/image/ImageTagsDisplay"
 
 interface ImageModalClientProps {
-    image: ImageType & { profiles: any }
-    currentUser: any
-    isSaved: boolean
-    // SSR Data for Tags
-    initialCanonicalTags: any[]
-    initialAuthorTags: any[]
-    initialCommunityTags: any[]
-    initialUserTags: any[]
+    imageId: string
+    initialThumbnailUrl?: string
+    initialAspectRatio?: number
 }
 
 export function ImageModalClient({
-    image: initialImage,
-    currentUser,
-    isSaved: initialIsSaved,
-    initialCanonicalTags,
-    initialAuthorTags,
-    initialCommunityTags,
-    initialUserTags
+    imageId,
+    initialThumbnailUrl,
+    initialAspectRatio
 }: ImageModalClientProps) {
     const router = useRouter()
-    const [image, setImage] = useState(initialImage)
-    const [title, setTitle] = useState(initialImage.title)
-    const [topic, setTopic] = useState(initialImage.topic || "")
+    const [currentUser, setCurrentUser] = useState<any>(null)
+
+    // Auth Check
+    useEffect(() => {
+        const supabase = createClient()
+        supabase.auth.getUser().then(({ data }) => setCurrentUser(data.user))
+    }, [])
+
+    // SWR Data Fetching
+    const { data, isLoading } = useSWR(
+        imageId,
+        getClientImageDetails,
+        {
+            revalidateOnFocus: false,
+            dedupingInterval: 60000, // 1 minute cache
+        }
+    )
+
+    const fullImage = data?.publicData?.image
+    const userContext = data?.userContext
+
+    // Local Mutation State
+    const [title, setTitle] = useState("")
+    const [topic, setTopic] = useState("")
     const [isEditing, setIsEditing] = useState(false)
     const [editLoading, setEditLoading] = useState(false)
 
-    // We don't need independent loading states for data anymore!
-    // It's passed in via props props.
+    // Sync state when data arrives
+    useEffect(() => {
+        if (fullImage) {
+            setTitle(fullImage.title)
+            setTopic(fullImage.topic || "")
+        }
+    }, [fullImage])
 
-    const isOwner = currentUser && image && currentUser.id === image.artist_id
+    // Derived State
+    const isOwner = currentUser && fullImage && currentUser.id === fullImage.artist_id
+
+    // VISUALS: Use Thumbnail until Full Image is ready
+    const displayUrl = fullImage?.url || initialThumbnailUrl || ""
+    const isImageLoaded = !!fullImage
 
     const handleDelete = async () => {
-        if (!image) return
-
+        if (!imageId) return
         try {
-            const res = await deleteImage(image.id)
+            const res = await deleteImage(imageId)
             if (res && res.error) {
                 toast.error(res.error)
             } else {
-                router.back() // Close modal on success (and maybe refresh?)
+                router.back()
             }
         } catch (error: any) {
             if (error?.digest?.startsWith('NEXT_REDIRECT')) {
-                // Next.js redirection handling
                 router.back()
                 return
             }
@@ -80,23 +103,20 @@ export function ImageModalClient({
     }
 
     const handleUpdate = async () => {
-        if (!image) return
+        if (!fullImage) return
         setEditLoading(true)
-
         try {
             const formData = new FormData()
-            formData.append('id', image.id)
+            formData.append('id', imageId)
             formData.append('title', title)
             formData.append('topic', topic)
-
             const res = await updateImage(formData)
-
             if (res.error) {
                 toast.error(res.error)
             } else {
                 toast.success("Image updated successfully")
                 setIsEditing(false)
-                setImage(prev => ({ ...prev, title, topic } as any))
+                // In a real app, we'd mutate SWR here. For now rely on local state or revalidating.
             }
         } catch (error) {
             toast.error("An error occurred while updating")
@@ -124,15 +144,19 @@ export function ImageModalClient({
                 {/* LEFT: Image Container */}
                 <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
                     <div className="relative w-full h-full">
-                        <Image
-                            src={image.url}
-                            alt={image.title}
-                            fill
-                            className="object-contain"
-                            priority
-                            quality={100}
-                            sizes="(max-width: 768px) 100vw, calc(100vw - 400px)"
-                        />
+                        {displayUrl ? (
+                            <Image
+                                src={displayUrl}
+                                alt={title || "Image"}
+                                fill
+                                className={`object-contain transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-80 blur-sm'}`}
+                                priority
+                                quality={isImageLoaded ? 100 : 50}
+                                sizes="(max-width: 768px) 100vw, calc(100vw - 400px)"
+                            />
+                        ) : (
+                            <Skeleton className="w-full h-full bg-zinc-800" />
+                        )}
                     </div>
                 </div>
 
@@ -143,180 +167,136 @@ export function ImageModalClient({
                     <div className="p-6 flex items-center justify-between sticky top-0 bg-zinc-900 z-10">
                         <div className="flex gap-2">
                             <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-white">
-                                <MoreHorizontal className="w-5 h-5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-white">
                                 <Share2 className="w-5 h-5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-white">
-                                <LinkIcon className="w-5 h-5" />
                             </Button>
                         </div>
 
-                        {isOwner ? (
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="rounded-full hover:bg-white/10 text-white"
-                                    onClick={() => setIsEditing(!isEditing)}
-                                >
-                                    <Pencil className="w-5 h-5" />
-                                </Button>
-
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="rounded-full hover:bg-red-500/20 text-red-500">
-                                            <Trash2 className="w-5 h-5" />
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                This action cannot be undone. This will permanently delete your image.
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-                                                Delete
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
+                        {/* Save Button / Owner Actions */}
+                        {isLoading ? (
+                            <Skeleton className="w-8 h-8 rounded-full" />
                         ) : (
-                            currentUser && (
-                                <SaveButton
-                                    imageId={image.id}
-                                    initialIsSaved={initialIsSaved}
-                                    className="text-zinc-400 hover:text-white"
-                                />
+                            isOwner ? (
+                                <div className="flex gap-2">
+                                    <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsEditing(!isEditing)}><Pencil className="w-5 h-5" /></Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="text-red-500"><Trash2 className="w-5 h-5" /></Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>Irreversible deletion.</AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={handleDelete} className="bg-red-600">Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                            ) : (
+                                currentUser && (
+                                    <SaveButton
+                                        imageId={imageId}
+                                        initialIsSaved={userContext?.isSaved || false}
+                                        className="text-zinc-400 hover:text-white"
+                                    />
+                                )
                             )
                         )}
                     </div>
 
                     {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar">
-                        {isEditing ? (
-                            <div className="space-y-4 mb-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="title" className="text-white">Title</Label>
-                                    <Input
-                                        id="title"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        className="bg-white/5 border-white/10 text-white"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="topic" className="text-white">Topic</Label>
-                                    <Input
-                                        id="topic"
-                                        value={topic}
-                                        onChange={(e) => setTopic(e.target.value)}
-                                        className="bg-white/5 border-white/10 text-white"
-                                    />
-                                </div>
-                                <div className="flex gap-2 justify-end mt-4">
-                                    <Button variant="ghost" onClick={() => setIsEditing(false)} className="text-white hover:bg-white/10">
-                                        Cancel
-                                    </Button>
-                                    <Button onClick={handleUpdate} disabled={editLoading} className="bg-white text-black hover:bg-zinc-200">
-                                        {editLoading ? "Saving..." : "Save Changes"}
-                                    </Button>
+                        {!fullImage ? (
+                            <div className="space-y-4">
+                                <Skeleton className="h-10 w-3/4" />
+                                <Skeleton className="h-4 w-1/2" />
+                                <div className="flex gap-3 mt-6">
+                                    <Skeleton className="w-10 h-10 rounded-full" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="h-3 w-16" />
+                                    </div>
                                 </div>
                             </div>
                         ) : (
-                            <>
-                                <h1 className="text-3xl font-bold text-white mb-4 leading-tight">{image.title}</h1>
-
-                                {image.description && (
-                                    <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-                                        {image.description}
-                                    </p>
-                                )}
-                            </>
+                            isEditing ? (
+                                <div className="space-y-4 mb-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="title" className="text-white">Title</Label>
+                                        <Input
+                                            id="title"
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            className="bg-white/5 border-white/10 text-white"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="topic" className="text-white">Topic</Label>
+                                        <Input
+                                            id="topic"
+                                            value={topic}
+                                            onChange={(e) => setTopic(e.target.value)}
+                                            className="bg-white/5 border-white/10 text-white"
+                                        />
+                                    </div>
+                                    <div className="flex gap-2 justify-end mt-4">
+                                        <Button variant="ghost" onClick={() => setIsEditing(false)} className="text-white hover:bg-white/10">
+                                            Cancel
+                                        </Button>
+                                        <Button onClick={handleUpdate} disabled={editLoading} className="bg-white text-black hover:bg-zinc-200">
+                                            {editLoading ? "Saving..." : "Save Changes"}
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <h1 className="text-3xl font-bold text-white mb-4 leading-tight">{fullImage.title}</h1>
+                                    {fullImage.description && <p className="text-zinc-400 text-sm mb-6 leading-relaxed">{fullImage.description}</p>}
+                                </>
+                            )
                         )}
 
                         {/* Artist Block */}
-                        <div onClick={() => window.location.href = `/profile/${image.profiles?.username}`} className="block group mb-8 cursor-pointer">
-                            <div className="flex items-center gap-3 p-2 rounded-lg -mx-2 hover:bg-white/5 transition-colors">
-                                <Avatar className="w-10 h-10 ring-2 ring-transparent group-hover:ring-white/10 transition-all">
-                                    <AvatarImage src={image.profiles?.avatar_url || ""} />
-                                    <AvatarFallback>{image.profiles?.username?.charAt(0) || "?"}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className="text-sm font-semibold text-white group-hover:text-indigo-400 transition-colors">
-                                        {image.profiles?.username || "Unknown"}
-                                    </p>
-                                    <p className="text-xs text-zinc-500">1.2k followers</p>
-                                </div>
-                                <Button variant="secondary" className="ml-auto rounded-full text-xs font-semibold h-8 bg-white/10 hover:bg-white/20 text-white border-none group-hover:bg-white/20">
-                                    Visit
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Comments / Metadata Section */}
-                        <div className="space-y-6">
-                            <div className="text-sm font-semibold text-white mb-2">Properties</div>
-
-                            {/* Tech Specs */}
-                            <div className="grid grid-cols-2 gap-3">
-                                {/* Legacy tech specs removed */}
-                            </div>
-
-                            {image.color_palette && image.color_palette.length > 0 && (
-                                <div className="bg-black/30 p-4 rounded-xl border border-white/5">
-                                    <span className="text-[10px] uppercase text-zinc-500 font-bold block mb-3">Palette</span>
-                                    <div className="flex flex-wrap gap-2">
-                                        {image.color_palette.map((color: string, i: number) => (
-                                            <div
-                                                key={i}
-                                                className="w-8 h-8 rounded-full border border-white/10 cursor-pointer hover:scale-110 transition-transform"
-                                                style={{ backgroundColor: color }}
-                                                title={color}
-                                            />
-                                        ))}
+                        {fullImage?.profiles && (
+                            <div onClick={() => window.location.href = `/profile/${fullImage.profiles?.username}`} className="block group mb-8 cursor-pointer mt-6">
+                                <div className="flex items-center gap-3 p-2 rounded-lg -mx-2 hover:bg-white/5 transition-colors">
+                                    <Avatar className="w-10 h-10 ring-2 ring-transparent group-hover:ring-white/10 transition-all">
+                                        <AvatarImage src={fullImage.profiles?.avatar_url || ""} />
+                                        <AvatarFallback>{fullImage.profiles?.username?.charAt(0) || "?"}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="text-sm font-semibold text-white group-hover:text-indigo-400 transition-colors">
+                                            {fullImage.profiles?.username || "Unknown"}
+                                        </p>
                                     </div>
                                 </div>
-                            )}
+                            </div>
+                        )}
 
-                            {image.topic && (
-                                <div className="mt-4">
-                                    <span className="inline-block bg-white/10 text-white text-xs px-3 py-1 rounded-full font-medium">
-                                        #{image.topic}
-                                    </span>
+                        {/* Tags & Metadata */}
+                        {data?.publicData ? (
+                            <div className="space-y-4 pt-4 border-t border-white/5">
+                                <ImageTagsDisplay
+                                    imageId={imageId}
+                                    artistId={fullImage?.artist_id || ""}
+                                    currentUserId={currentUser?.id}
+                                    initialCanonicalTags={data.publicData.canonicalTags}
+                                    initialAuthorTags={data.publicData.authorTags}
+                                    initialCommunityTags={data.publicData.communityTags}
+                                    initialUserTags={userContext?.userTags || []}
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-2 mt-8">
+                                <Skeleton className="h-6 w-1/3" />
+                                <div className="flex gap-2">
+                                    <Skeleton className="h-6 w-16 rounded-full" />
+                                    <Skeleton className="h-6 w-16 rounded-full" />
                                 </div>
-                            )}
-                        </div>
-
-                        {/* NEW 3-Layer Tagging System Display */}
-                        <div className="space-y-4 pt-4 border-t border-white/5">
-                            <ImageTagsDisplay
-                                imageId={image.id}
-                                artistId={image.artist_id}
-                                currentUserId={currentUser?.id}
-                                initialCanonicalTags={initialCanonicalTags}
-                                initialAuthorTags={initialAuthorTags}
-                                initialCommunityTags={initialCommunityTags}
-                                initialUserTags={initialUserTags}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Sticky Footer */}
-                    <div className="p-4 border-t border-white/5 bg-zinc-900 flex flex-col gap-2 justify-center">
-                        <Button
-                            variant="outline"
-                            className="rounded-full border-white/10 hover:bg-white/5 text-white w-full"
-                            onClick={() => window.location.href = `/image/${image.id}`}
-                        >
-                            <Maximize2 className="w-4 h-4 mr-2" />
-                            Open Full Page
-                        </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </DialogContent>

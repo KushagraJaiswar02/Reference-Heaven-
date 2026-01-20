@@ -4,6 +4,7 @@ import { getImageCanonicalTags } from "@/app/actions/tagging/canonical"
 import { getAuthorTags } from "@/app/actions/tagging/author"
 import { getPublicCommunityTags } from "@/app/actions/tagging/user"
 import { ImageCardDTO, ImageDetailDTO, UserImageContextDTO } from "./dto"
+import { getDetailImageUrl } from "@/lib/image-optim"
 
 // Cached public data fetcher for DETAILS
 export const getPublicImageDetails = cache(async (imageId: string): Promise<ImageDetailDTO | null> => {
@@ -21,8 +22,17 @@ export const getPublicImageDetails = cache(async (imageId: string): Promise<Imag
         return null
     }
 
+    const img = imageRes.data;
+
     return {
-        image: imageRes.data,
+        image: {
+            ...img,
+            url: getDetailImageUrl(img.url), // Transform to optimized detail size
+            width: img.width || 1000,
+            height: img.height || 1000,
+            aspect_ratio: (img.width || 1000) / (img.height || 1000),
+            profiles: img.profiles
+        },
         canonicalTags: canonicalTags || [],
         authorTags: authorTags || [],
         communityTags: communityTags || []
@@ -50,19 +60,4 @@ export const getUserImageContext = async (imageId: string): Promise<UserImageCon
     }
 }
 
-// Lightweight Feed Fetcher (Public, Cached)
-export const getFeedImages = cache(async (): Promise<ImageCardDTO[]> => {
-    const supabase = await createClient()
-
-    const { data, error } = await supabase
-        .from('images')
-        .select('id, url, title, topic') // EXPLICIT SELECTION
-        .order('created_at', { ascending: false })
-
-    if (error) {
-        console.error("Feed fetch error:", error)
-        return []
-    }
-
-    return data as ImageCardDTO[]
-})
+// getFeedImages removed as it was unused and outdated

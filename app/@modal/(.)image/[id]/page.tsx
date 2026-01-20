@@ -1,36 +1,26 @@
-import { createClient } from "@/utils/supabase/server"
-import { notFound } from "next/navigation"
 import { ImageModalClient } from "@/components/gallery/ImageModalClient"
-import { getPublicImageDetails, getUserImageContext } from "@/app/data/image"
 
-export default async function ImageModalPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ImageModalPage({
+    params,
+    searchParams
+}: {
+    params: Promise<{ id: string }>,
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
     const { id } = await params
+    const sp = await searchParams
 
-    // Server-side parallel fetching!
-    const [publicData, userContext] = await Promise.all([
-        getPublicImageDetails(id),
-        getUserImageContext(id)
-    ])
+    const thumb = sp.thumb as string | undefined
+    const ar = sp.ar ? parseFloat(sp.ar as string) : undefined
 
-    if (!publicData) {
-        return notFound()
-    }
-
-    const { image, canonicalTags, authorTags, communityTags } = publicData
-    const { isSaved, userTags } = userContext
-
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // NO BLOCKING DATA FETCH
+    // We pass the "skeleton key" (id + thumb) to the client immediately.
 
     return (
         <ImageModalClient
-            image={image}
-            currentUser={user}
-            isSaved={isSaved}
-            initialCanonicalTags={canonicalTags}
-            initialAuthorTags={authorTags}
-            initialCommunityTags={communityTags}
-            initialUserTags={userTags}
+            imageId={id}
+            initialThumbnailUrl={thumb}
+            initialAspectRatio={ar}
         />
     )
 }
