@@ -112,6 +112,7 @@ export function UserTagManager({ imageId, initialTags }: UserTagManagerProps) {
                         className="h-9 pr-8"
                         disabled={submitting || limitReached}
                         list="user-tags-suggestions"
+                        suppressHydrationWarning
                     />
                     <datalist id="user-tags-suggestions">
                         {suggestions.map(s => <option key={s} value={s} />)}
