@@ -85,7 +85,7 @@ export function VisitorImageDetails({
 
                 {/* Metadata */}
                 <div className="space-y-6">
-                    {(image.topic || image.lighting_style || image.perspective_angle) && (
+                    {(image.topic) && (
                         <div className="space-y-4">
                             <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 pl-1">
                                 Technical Specs
@@ -100,24 +100,7 @@ export function VisitorImageDetails({
                                         <span className="text-xs font-medium text-white">{image.topic}</span>
                                     </div>
                                 )}
-                                {image.lighting_style && (
-                                    <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/40 border border-white/[0.03] hover:border-white/[0.08] transition-colors group">
-                                        <div className="flex items-center gap-3">
-                                            <Zap className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
-                                            <span className="text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors">Lighting</span>
-                                        </div>
-                                        <span className="text-xs font-medium text-white">{image.lighting_style}</span>
-                                    </div>
-                                )}
-                                {image.perspective_angle && (
-                                    <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/40 border border-white/[0.03] hover:border-white/[0.08] transition-colors group">
-                                        <div className="flex items-center gap-3">
-                                            <Box className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
-                                            <span className="text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors">Perspective</span>
-                                        </div>
-                                        <span className="text-xs font-medium text-white">{image.perspective_angle}</span>
-                                    </div>
-                                )}
+
                             </div>
                         </div>
                     )}

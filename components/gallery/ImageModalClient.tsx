@@ -265,18 +265,7 @@ export function ImageModalClient({
 
                             {/* Tech Specs */}
                             <div className="grid grid-cols-2 gap-3">
-                                {image.lighting_style && (
-                                    <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-                                        <span className="text-[10px] uppercase text-zinc-500 font-bold block mb-1">Lighting</span>
-                                        <p className="text-sm font-medium text-white">{image.lighting_style}</p>
-                                    </div>
-                                )}
-                                {image.perspective_angle && (
-                                    <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-                                        <span className="text-[10px] uppercase text-zinc-500 font-bold block mb-1">Perspective</span>
-                                        <p className="text-sm font-medium text-white">{image.perspective_angle}</p>
-                                    </div>
-                                )}
+                                {/* Legacy tech specs removed */}
                             </div>
 
                             {image.color_palette && image.color_palette.length > 0 && (

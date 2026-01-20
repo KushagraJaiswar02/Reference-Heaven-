@@ -23,8 +23,7 @@ export type ImageDetailDTO = {
         topic: string | null
         artist_id: string
         likes_count: number
-        lighting_style: string | null
-        perspective_angle: string | null
+
         color_palette: string[] | null
         created_at: string
         profiles: {

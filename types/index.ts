@@ -10,8 +10,7 @@ export interface Image {
     artist_id: string
     topic?: string | null
     likes_count: number
-    lighting_style?: string | null
-    perspective_angle?: string | null
+
     color_palette?: string[] | null
     profiles?: {
         username: string
