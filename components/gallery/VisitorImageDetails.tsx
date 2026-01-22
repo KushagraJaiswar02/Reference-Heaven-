@@ -1,7 +1,10 @@
+"use client"
+
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Share2, Hash, Zap, Box } from "lucide-react"
+import { Share2, Hash, Zap, Box, Download } from "lucide-react"
+import { downloadImage } from "@/lib/download"
 import { SaveButton } from "@/components/SaveButton"
 import { ImageTagsDisplay } from "@/components/image/ImageTagsDisplay"
 import { ColorPalette } from "./ColorPalette"
@@ -36,6 +39,14 @@ export function VisitorImageDetails({
                 <div className="flex gap-2">
                     <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-transparent hover:bg-white/10 text-zinc-400 hover:text-white transition-all">
                         <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="w-9 h-9 rounded-lg bg-transparent hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                        onClick={() => downloadImage(image.url, `${image.title}.jpg`)}
+                    >
+                        <Download className="w-4 h-4" />
                     </Button>
                 </div>
 
