@@ -198,113 +198,115 @@ export function UploadModal() {
                     Add Reference
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-0 clip-content outline-none">
+                <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
                     <DialogTitle>Add Reference Image</DialogTitle>
                     <DialogDescription>
                         {step === 'type' ? "Choose how to add your reference." : "Add details and tags."}
                     </DialogDescription>
                 </DialogHeader>
 
-                {step === 'type' && (
-                    <Tabs defaultValue="upload" value={tab} onValueChange={(v) => {
-                        setTab(v as any)
-                        setFile(null)
-                        setExternalUrl("")
-                        setPreviewUrl("")
-                    }} className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="upload">Upload File</TabsTrigger>
-                            <TabsTrigger value="link">External URL</TabsTrigger>
-                        </TabsList>
+                <div className="flex-1 overflow-y-auto px-6 py-2">
+                    {step === 'type' && (
+                        <Tabs defaultValue="upload" value={tab} onValueChange={(v) => {
+                            setTab(v as any)
+                            setFile(null)
+                            setExternalUrl("")
+                            setPreviewUrl("")
+                        }} className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="upload">Upload File</TabsTrigger>
+                                <TabsTrigger value="link">External URL</TabsTrigger>
+                            </TabsList>
 
-                        <TabsContent value="upload" className="py-4 space-y-4">
-                            <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 hover:bg-muted/50 transition-colors cursor-pointer relative">
-                                <Input
-                                    type="file"
-                                    accept="image/*"
-                                    className="absolute inset-0 opacity-0 cursor-pointer"
-                                    onChange={handleFileSelect}
-                                />
-                                {previewUrl ? (
-                                    <img src={previewUrl} alt="Preview" className="max-h-64 object-contain rounded-md" />
-                                ) : (
-                                    <div className="text-center space-y-2">
-                                        <div className="flex justify-center">
-                                            <Upload className="h-10 w-10 text-muted-foreground" />
+                            <TabsContent value="upload" className="py-4 space-y-4">
+                                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 hover:bg-muted/50 transition-colors cursor-pointer relative">
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                        onChange={handleFileSelect}
+                                    />
+                                    {previewUrl ? (
+                                        <img src={previewUrl} alt="Preview" className="max-h-64 object-contain rounded-md" />
+                                    ) : (
+                                        <div className="text-center space-y-2">
+                                            <div className="flex justify-center">
+                                                <Upload className="h-10 w-10 text-muted-foreground" />
+                                            </div>
+                                            <p className="font-medium">Click to upload or drag & drop</p>
+                                            <p className="text-xs text-muted-foreground">Max 5MB • JPG, PNG, WEBP</p>
                                         </div>
-                                        <p className="font-medium">Click to upload or drag & drop</p>
-                                        <p className="text-xs text-muted-foreground">Max 5MB • JPG, PNG, WEBP</p>
-                                    </div>
-                                )}
-                            </div>
-                        </TabsContent>
+                                    )}
+                                </div>
+                            </TabsContent>
 
-                        <TabsContent value="link" className="py-4 space-y-4">
-                            <div className="space-y-4">
-                                <Label>Image URL</Label>
-                                <div className="flex gap-2">
-                                    <div className="relative flex-1">
-                                        <LinkIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                        <Input
-                                            placeholder="https://example.com/image.jpg"
-                                            className="pl-9"
-                                            value={externalUrl}
-                                            onChange={(e) => setExternalUrl(e.target.value)}
-                                            onBlur={handleExternalUrlBlur}
-                                        />
+                            <TabsContent value="link" className="py-4 space-y-4">
+                                <div className="space-y-4">
+                                    <Label>Image URL</Label>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <LinkIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                placeholder="https://example.com/image.jpg"
+                                                className="pl-9"
+                                                value={externalUrl}
+                                                onChange={(e) => setExternalUrl(e.target.value)}
+                                                onBlur={handleExternalUrlBlur}
+                                            />
+                                        </div>
+                                    </div>
+                                    {previewUrl && (
+                                        <div className="flex justify-center border rounded-md p-2 bg-muted/20">
+                                            <img src={previewUrl} alt="Preview" className="max-h-64 object-contain" />
+                                        </div>
+                                    )}
+                                </div>
+                            </TabsContent>
+                        </Tabs>
+                    )}
+
+                    {step === 'details' && (
+                        <div className="py-4 space-y-6">
+                            <div className="flex gap-4 items-start">
+                                <div className="w-24 h-24 shrink-0 rounded-md overflow-hidden bg-muted border">
+                                    {previewUrl ? (
+                                        <img src={previewUrl} alt="Thumb" className="w-full h-full object-cover" />
+                                    ) : <ImageIcon className="w-full h-full p-6 text-muted-foreground" />}
+                                </div>
+                                <div className="flex-1 space-y-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="title">Title *</Label>
+                                        <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Cyberpunk Street" required />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="topic">Topic (Broad) *</Label>
+                                        <Input id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g., Sci-Fi" required />
                                     </div>
                                 </div>
-                                {previewUrl && (
-                                    <div className="flex justify-center border rounded-md p-2 bg-muted/20">
-                                        <img src={previewUrl} alt="Preview" className="max-h-64 object-contain" />
-                                    </div>
-                                )}
                             </div>
-                        </TabsContent>
-                    </Tabs>
-                )}
 
-                {step === 'details' && (
-                    <div className="py-4 space-y-6">
-                        <div className="flex gap-4 items-start">
-                            <div className="w-24 h-24 shrink-0 rounded-md overflow-hidden bg-muted border">
-                                {previewUrl ? (
-                                    <img src={previewUrl} alt="Thumb" className="w-full h-full object-cover" />
-                                ) : <ImageIcon className="w-full h-full p-6 text-muted-foreground" />}
+                            <div className="grid gap-2">
+                                <Label htmlFor="description">Description</Label>
+                                <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Context, source, notes..." />
                             </div>
-                            <div className="flex-1 space-y-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="title">Title *</Label>
-                                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Cyberpunk Street" required />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="topic">Topic (Broad) *</Label>
-                                    <Input id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g., Sci-Fi" required />
-                                </div>
+
+                            <div className="pt-2">
+                                <TaggingForm
+                                    initialData={taggingData}
+                                    onChange={setTaggingData}
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="color_palette">Color Palette (Hex codes, optional)</Label>
+                                <Input id="color_palette" value={colorPaletteStr} onChange={(e) => setColorPaletteStr(e.target.value)} placeholder="#ff0000, #00ff00" />
                             </div>
                         </div>
+                    )}
+                </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Context, source, notes..." />
-                        </div>
-
-                        <div className="pt-2">
-                            <TaggingForm
-                                initialData={taggingData}
-                                onChange={setTaggingData}
-                            />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="color_palette">Color Palette (Hex codes, optional)</Label>
-                            <Input id="color_palette" value={colorPaletteStr} onChange={(e) => setColorPaletteStr(e.target.value)} placeholder="#ff0000, #00ff00" />
-                        </div>
-                    </div>
-                )}
-
-                <DialogFooter className="flex justify-between items-center sm:justify-between">
+                <DialogFooter className="flex justify-between items-center sm:justify-between px-6 pb-6 pt-2 shrink-0 border-t border-border mt-auto bg-background z-10">
                     {step === 'details' ? (
                         <Button variant="ghost" onClick={() => setStep('type')} disabled={loading}>
                             Back

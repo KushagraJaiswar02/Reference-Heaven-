@@ -79,7 +79,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
                     Edit Profile
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] bg-zinc-950 border-zinc-800 text-white">
+            <DialogContent className="sm:max-w-[500px] bg-zinc-950 border-zinc-800 text-white max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Profile</DialogTitle>
                     <DialogDescription className="text-zinc-400">
@@ -170,7 +170,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
                         </div>
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="sticky bottom-0 bg-zinc-950 pt-4 pb-2 border-t border-zinc-800 -mx-6 px-6 mt-6">
                         <Button
                             type="button"
                             variant="ghost"

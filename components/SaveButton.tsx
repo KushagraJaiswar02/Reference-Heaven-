@@ -37,25 +37,25 @@ export function SaveButton({ imageId, initialIsSaved, className, showLabel = fal
                 className={cn(
                     "transition-all duration-300 group",
                     !showLabel && "hover:bg-transparent hover:scale-110",
-                    showLabel && isSaved && "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20",
-                    showLabel && !isSaved && "bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-500/20",
+                    showLabel && isSaved && "bg-black/50 text-white hover:bg-black/60", // Saved state (Dark pill)
+                    showLabel && !isSaved && "bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-900/20", // Unsaved state (Red pill)
                     className
                 )}
             >
                 <Bookmark
                     className={cn(
                         "w-5 h-5 transition-all duration-300",
-                        isSaved ? "fill-violet-500 text-violet-500 drop-shadow-[0_0_8px_rgba(139,92,246,0.5)]" : "text-zinc-400 group-hover:text-white",
-                        showLabel && !isSaved && "text-white group-hover:text-white",
+                        isSaved ? "fill-white text-white" : "text-white fill-transparent", // Always white text/icon in pill mode usually
+                        !showLabel && (isSaved ? "fill-red-600 text-red-600" : "text-zinc-600"), // Icon only mode
                         showLabel && "mr-2"
                     )}
                 />
                 {showLabel && (
                     <span className={cn(
                         "font-medium",
-                        isSaved ? "text-violet-400" : "text-white"
+                        isSaved ? "text-white" : "text-white"
                     )}>
-                        {isSaved ? "Saved" : "Save to Collection"}
+                        {isSaved ? "Saved" : "Save"}
                     </span>
                 )}
                 <span className="sr-only">{isSaved ? "Unsave" : "Save"}</span>

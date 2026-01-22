@@ -90,78 +90,76 @@ export function Navbar() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-zinc-950/70 backdrop-blur-md transition-all duration-300">
-                <div className="container flex h-16 items-center px-4 md:px-6 max-w-7xl mx-auto gap-4 md:gap-8">
+            <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl transition-all duration-300 border-b border-white/5 shadow-sm">
+                <div className="flex h-20 items-center px-4 md:px-8 max-w-[1920px] mx-auto gap-6">
                     {/* Left: Brand */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-shrink-0">
                         {/* Mobile Menu Trigger */}
-                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-zinc-400 hover:text-white transition-colors">
-                            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-zinc-500 hover:text-foreground transition-colors p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
 
                         <Link href="/" className="flex items-center gap-2 group">
-                            <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">
+                            <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                                RH
+                            </div>
+                            <span className="text-xl font-bold tracking-tight text-foreground hidden xl:block">
                                 Reference Heaven
                             </span>
                         </Link>
                     </div>
 
-                    {/* Center: Search */}
-                    <div className="flex-1 flex justify-center max-w-lg mx-auto md:px-8">
-                        <div className="w-full hidden md:block">
-                            <GlobalSearchInput />
-                        </div>
+                    {/* Center: Search (Hero) */}
+                    <div className="flex-1 max-w-2xl mx-auto w-full">
+                        <GlobalSearchInput />
                     </div>
 
                     {/* Right: Actions */}
-                    <div className="flex items-center gap-4 md:gap-6">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                         {/* Desktop Nav */}
-                        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                        <nav className="hidden lg:flex items-center gap-1 font-medium text-sm">
                             <Link
                                 href="/"
-                                className="text-zinc-400 hover:text-white transition-colors duration-200"
+                                className="px-5 py-2.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-foreground transition-all"
                             >
-                                Gallery
+                                Home
                             </Link>
                             <Link
                                 href="/collections"
-                                className="text-zinc-400 hover:text-white transition-colors duration-200"
+                                className="px-5 py-2.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-foreground transition-all"
                             >
                                 Collections
                             </Link>
                             <Link
                                 href="/artists"
-                                className="text-zinc-400 hover:text-white transition-colors duration-200"
+                                className="px-5 py-2.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-foreground transition-all"
                             >
                                 Artists
                             </Link>
-                            {user && (
-                                <Link
-                                    href="/saved"
-                                    className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors duration-200"
-                                >
-                                    <Bookmark className="w-4 h-4" />
-                                    <span>Saved</span>
-                                </Link>
-                            )}
                         </nav>
 
-                        <div className="h-6 w-[1px] bg-white/10 hidden md:block"></div>
+                        <div className="h-8 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-2 hidden lg:block"></div>
 
                         {user ? (
-                            <div className="flex items-center gap-3">
-                                {/* Upload Button - Mobile: Icon only, Desktop: Full */}
+                            <div className="flex items-center gap-3 pl-2">
                                 <UploadModal />
+                                <Link
+                                    href="/saved"
+                                    className="p-2.5 rounded-full text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-foreground transition-all hidden sm:block"
+                                    title="Saved"
+                                >
+                                    <Bookmark className="w-6 h-6" />
+                                </Link>
                                 <UserNav user={user} profile={profile} />
                             </div>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link href="/login" className="hidden md:block">
-                                    <Button size="sm" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5">Sign In</Button>
+                                <Link href="/login" className="hidden sm:block">
+                                    <Button variant="ghost" className="rounded-full px-6 text-base font-medium">Log in</Button>
                                 </Link>
                                 <Link href="/signup">
-                                    <Button size="sm" className="bg-white text-black hover:bg-zinc-200 font-bold rounded-lg px-5 transition-transform hover:scale-105">
-                                        Get Started
+                                    <Button className="rounded-full px-6 h-10 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all">
+                                        Sign up
                                     </Button>
                                 </Link>
                             </div>

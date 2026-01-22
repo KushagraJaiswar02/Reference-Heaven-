@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Navbar } from "@/components/shared/Navbar"
 import { Toaster } from "@/components/ui/sonner"
+import { FloatingThemeToggle } from "@/components/FloatingThemeToggle"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,9 +39,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          <main className="flex-1">
+          <main className="flex-1 w-full overflow-x-hidden">
             {children}
           </main>
+          <FloatingThemeToggle />
           <Toaster position="bottom-right" richColors />
         </ThemeProvider>
       </body>
