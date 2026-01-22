@@ -1,6 +1,7 @@
 // GRID DTO (Lightweight, <1KB ideal)
 export type ImageCardDTO = {
     id: string
+    url: string // Full URL for actions (Download)
     thumbnailUrl: string // Optimized/Small URL
     aspectRatio: number // For Masonry layout
     title: string // Alt text / Minimal display

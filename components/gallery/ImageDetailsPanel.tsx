@@ -12,6 +12,7 @@ interface ImageDetailsPanelProps {
     initialAuthorTags: any[]
     initialCommunityTags: any[]
     initialUserTags: any[]
+    className?: string
 }
 
 /**
@@ -27,7 +28,8 @@ export function ImageDetailsPanel({
     initialCanonicalTags,
     initialAuthorTags,
     initialCommunityTags,
-    initialUserTags
+    initialUserTags,
+    className
 }: ImageDetailsPanelProps) {
     const isOwner = currentUserId && image.artist_id === currentUserId
 
@@ -40,6 +42,7 @@ export function ImageDetailsPanel({
                 initialAuthorTags={initialAuthorTags}
                 initialCommunityTags={initialCommunityTags}
                 initialUserTags={initialUserTags}
+                className={className}
             />
         )
     }
@@ -53,6 +56,7 @@ export function ImageDetailsPanel({
             initialAuthorTags={initialAuthorTags}
             initialCommunityTags={initialCommunityTags}
             initialUserTags={initialUserTags}
+            className={className}
         />
     )
 }

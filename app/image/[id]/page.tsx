@@ -6,6 +6,8 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { ImageDetailsPanel } from "@/components/gallery/ImageDetailsPanel"
 import { getPublicImageDetails, getUserImageContext } from "@/app/data/image"
+import { RelatedImages } from "@/components/gallery/RelatedImages"
+import { Suspense } from "react"
 
 export default async function ImagePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -61,8 +63,14 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
                     initialAuthorTags={authorTags}
                     initialCommunityTags={communityTags}
                     initialUserTags={userTags}
+                    className="w-full md:w-[400px] bg-zinc-900 border-l border-white/5 h-full flex-shrink-0"
                 />
             </div>
+
+            {/* Related Images / Rabbit Hole */}
+            <Suspense fallback={<div className="w-full h-40 mt-12 flex items-center justify-center text-zinc-500">Loading related images...</div>}>
+                <RelatedImages topic={image.topic} currentImageId={image.id} />
+            </Suspense>
         </div>
     )
 }

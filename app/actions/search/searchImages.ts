@@ -19,7 +19,7 @@ function decodeCursor(cursor: string): { partA: string, partB: string } | null {
     }
 }
 
-export async function searchImages(request: SearchRequest) {
+export async function searchImages(request: SearchRequest): Promise<{ items: ImageCardDTO[], nextCursor: string | null, hasMore: boolean }> {
     const supabase = await createClient()
     const { context, scope, filters, cursor, limit = 20 } = request
 

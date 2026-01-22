@@ -35,6 +35,7 @@ interface OwnerImageDetailsProps {
     initialAuthorTags: any[]
     initialCommunityTags: any[]
     initialUserTags: any[]
+    className?: string
 }
 
 export function OwnerImageDetails({
@@ -43,7 +44,8 @@ export function OwnerImageDetails({
     initialCanonicalTags,
     initialAuthorTags,
     initialCommunityTags,
-    initialUserTags
+    initialUserTags,
+    className
 }: OwnerImageDetailsProps) {
     const router = useRouter()
     const [image, setImage] = useState(initialImage)
@@ -94,7 +96,7 @@ export function OwnerImageDetails({
     }
 
     return (
-        <div className="fixed right-6 top-6 bottom-6 w-[420px] flex flex-col bg-zinc-950/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden">
+        <div className={`flex flex-col bg-zinc-950/90 backdrop-blur-2xl border-l border-white/10 z-50 overflow-hidden h-full ${className}`}>
             {/* Header Actions */}
             <div className="p-5 flex items-center justify-between border-b border-white/5 bg-white/5 backdrop-blur-3xl sticky top-0 z-10">
                 <div className="flex gap-2">

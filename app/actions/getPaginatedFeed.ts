@@ -83,6 +83,7 @@ export async function getPaginatedFeed(cursor?: string, limit: number = 20): Pro
 
         return {
             id: img.id,
+            url: img.url,
             thumbnailUrl: getGridThumbnailUrl(img.url),
             aspectRatio: aspectRatio,
             title: img.title,
