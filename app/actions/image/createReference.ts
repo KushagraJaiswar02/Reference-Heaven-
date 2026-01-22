@@ -55,7 +55,9 @@ export async function createImageReference(data: CreateImageDTO) {
 
     if (dbError) {
         console.error('DB Error:', dbError)
-        throw new Error('Failed to save image metadata')
+        // Return structured error or throw with details 
+        // Note: Client 'toast' displays error.message
+        throw new Error(`DB Error: ${dbError.message} (${dbError.details || ''})`)
     }
 
     // Process Tags
