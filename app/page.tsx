@@ -12,10 +12,7 @@ export default async function Home() {
       <InfiniteFeed
         initialItems={items || []}
         initialNextCursor={nextCursor}
-        fetchNextPage={async (cursor) => {
-          'use server'
-          return getPaginatedFeed(cursor, 20)
-        }}
+
       />
     </div>
   )
