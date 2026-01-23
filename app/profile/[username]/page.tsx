@@ -106,43 +106,46 @@ export default async function ProfilePage({ params }: Props) {
     const totalUploads = feedImages.length || 0
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white pt-24 px-4 md:px-8">
+        <div className="min-h-screen bg-background text-foreground pt-24 px-4 md:px-8">
             {/* Header Section */}
             <div className="max-w-7xl mx-auto mb-16">
                 <div className="flex flex-col md:flex-row items-center md:items-start md:items-stretch gap-8">
                     {/* Avatar */}
-                    <Avatar className="w-32 h-32 border-4 border-zinc-900 shadow-2xl flex-shrink-0">
-                        <AvatarImage src={profile.avatar_url} className="object-cover" />
-                        <AvatarFallback className="bg-zinc-800 text-3xl font-bold text-zinc-500">
-                            {profile.username[0]?.toUpperCase()}
-                        </AvatarFallback>
-                    </Avatar>
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-2xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <Avatar className="w-32 h-32 md:w-40 md:h-40 border-4 border-background shadow-2xl flex-shrink-0 relative z-10">
+                            <AvatarImage src={profile.avatar_url} className="object-cover" />
+                            <AvatarFallback className="bg-muted text-3xl font-bold text-muted-foreground">
+                                {profile.username[0]?.toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                    </div>
 
                     {/* Info */}
                     <div className="flex-1 text-center md:text-left space-y-6 flex flex-col">
                         <div className="space-y-4">
                             <div>
-                                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">
+                                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-2">
                                     {profile.username}
                                 </h1>
                                 {profile.bio && (
-                                    <p className="text-zinc-400 max-w-2xl text-lg leading-relaxed">
+                                    <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed">
                                         {profile.bio}
                                     </p>
                                 )}
                             </div>
 
                             {/* Social Links */}
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                                 {profile.website && (
                                     <a
                                         href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 hover:bg-muted rounded-full text-sm font-medium transition-colors text-foreground"
                                     >
                                         <Globe className="w-4 h-4" />
-                                        <span className="text-sm">{new URL(profile.website.startsWith('http') ? profile.website : `https://${profile.website}`).hostname}</span>
+                                        <span>{new URL(profile.website.startsWith('http') ? profile.website : `https://${profile.website}`).hostname}</span>
                                     </a>
                                 )}
 
@@ -151,7 +154,7 @@ export default async function ProfilePage({ params }: Props) {
                                         href={getSocialUrl(profile.socials.instagram, 'instagram')}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-pink-500 hover:bg-white transition-all"
+                                        className="p-2.5 bg-muted/50 hover:bg-pink-500 hover:text-white rounded-full transition-all text-muted-foreground"
                                     >
                                         <Instagram className="w-5 h-5" />
                                     </a>
@@ -162,7 +165,7 @@ export default async function ProfilePage({ params }: Props) {
                                         href={getSocialUrl(profile.socials.twitter, 'twitter')}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-blue-400 hover:bg-white transition-all"
+                                        className="p-2.5 bg-muted/50 hover:bg-blue-400 hover:text-white rounded-full transition-all text-muted-foreground"
                                     >
                                         <Twitter className="w-5 h-5" />
                                     </a>
@@ -173,7 +176,7 @@ export default async function ProfilePage({ params }: Props) {
                                         href={getSocialUrl(profile.socials.artstation, 'artstation')}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-[#13aff0] hover:bg-white transition-all"
+                                        className="p-2.5 bg-muted/50 hover:bg-[#13aff0] hover:text-white rounded-full transition-all text-muted-foreground"
                                     >
                                         <Palette className="w-5 h-5" />
                                     </a>
@@ -184,7 +187,7 @@ export default async function ProfilePage({ params }: Props) {
                                         href={getSocialUrl(profile.socials.linkedin, 'linkedin')}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-[#0077b5] hover:bg-white transition-all"
+                                        className="p-2.5 bg-muted/50 hover:bg-[#0077b5] hover:text-white rounded-full transition-all text-muted-foreground"
                                     >
                                         <Linkedin className="w-5 h-5" />
                                     </a>
@@ -195,7 +198,7 @@ export default async function ProfilePage({ params }: Props) {
                                         href={getSocialUrl(profile.socials.youtube, 'youtube')}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-[#FF0000] hover:bg-white transition-all"
+                                        className="p-2.5 bg-muted/50 hover:bg-[#FF0000] hover:text-white rounded-full transition-all text-muted-foreground"
                                     >
                                         <Youtube className="w-5 h-5" />
                                     </a>
@@ -204,30 +207,30 @@ export default async function ProfilePage({ params }: Props) {
                         </div>
 
                         {/* Stats Bar */}
-                        <div className="flex items-center justify-center md:justify-start gap-8 border-y border-white/5 py-4 w-full md:w-fit px-8 bg-white/[0.02]">
+                        <div className="flex items-center justify-center md:justify-start gap-8 border-y border-border py-6 w-full md:w-fit px-8">
                             <div className="text-center md:text-left">
-                                <p className="text-2xl font-bold text-white">{totalUploads}</p>
-                                <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Uploads</p>
+                                <p className="text-3xl font-bold text-foreground">{totalUploads}</p>
+                                <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mt-1">Uploads</p>
                             </div>
-                            <div className="w-[1px] h-8 bg-white/10"></div>
+                            <div className="w-[1px] h-8 bg-border"></div>
                             <div className="text-center md:text-left">
-                                <p className="text-2xl font-bold text-white">0</p>
-                                <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">Followers</p>
+                                <p className="text-3xl font-bold text-foreground">0</p>
+                                <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mt-1">Followers</p>
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start mt-auto">
+                        <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start mt-auto pt-4">
                             {isOwner ? (
                                 <>
                                     <ProfileSettings profile={profile} />
                                     <Link href="/saved">
-                                        <Button variant="outline" className="rounded-full px-6 border-zinc-700 text-zinc-300 hover:text-white hover:border-white hover:bg-zinc-800 transition-all">
+                                        <Button variant="outline" className="rounded-full px-6 h-10 border-border bg-background hover:bg-muted font-medium">
                                             Saved References
                                         </Button>
                                     </Link>
                                 </>
                             ) : (
-                                <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 font-bold">
+                                <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-8 h-10 font-bold shadow-lg shadow-foreground/20">
                                     Follow
                                 </Button>
                             )}
@@ -236,7 +239,7 @@ export default async function ProfilePage({ params }: Props) {
 
                     {/* Right Column: Personal Tags (Owner Only) */}
                     {isOwner && (
-                        <div className="w-full md:w-80 flex-shrink-0">
+                        <div className="hidden xl:block w-80 flex-shrink-0">
                             <YourTagsProfileSection tags={personalTags} />
                         </div>
                     )}
@@ -244,21 +247,33 @@ export default async function ProfilePage({ params }: Props) {
             </div>
 
             {/* Gallery Section */}
-            <div className="max-w-[1920px] mx-auto">
-                <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-4">
-                    <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">
+            <div className="container mx-auto pb-20">
+                <div className="flex items-center justify-between mb-8 border-b border-border pb-4">
+                    <h2 className="text-lg font-semibold tracking-tight">
                         Portfolio
                     </h2>
-                    <span className="text-xs text-zinc-600 font-mono">
-                        {images?.length} ITEMS
+                    <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                        {images?.length || 0} ITEMS
                     </span>
                 </div>
 
                 {feedImages && feedImages.length > 0 ? (
                     <MasonryGrid images={feedImages} />
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-                        <p className="text-lg">No work uploaded yet.</p>
+                    <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-muted rounded-3xl bg-muted/20">
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4 text-muted-foreground">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                        </div>
+                        <h3 className="text-xl font-semibold mb-2">No work uploaded yet</h3>
+                        {isOwner ? (
+                            <p className="text-muted-foreground mb-6 max-w-sm">
+                                Share your first reference image with the community.
+                            </p>
+                        ) : (
+                            <p className="text-muted-foreground">
+                                This user hasn't uploaded any work yet.
+                            </p>
+                        )}
                     </div>
                 )}
             </div>
