@@ -7,13 +7,14 @@ import { useRouter } from "next/navigation"
 
 interface PostCardProps {
     image: ImageCardDTO
+    priority?: boolean
 }
 
 import { SaveButton } from "@/components/SaveButton"
 import { Download } from "lucide-react"
 import { downloadImage } from "@/lib/download"
 
-export function PostCard({ image }: PostCardProps) {
+export function PostCard({ image, priority = false }: PostCardProps) {
     const router = useRouter()
 
     const handleMouseEnter = () => {
@@ -39,7 +40,7 @@ export function PostCard({ image }: PostCardProps) {
                         height={Math.round(500 / (image.aspectRatio || 1))} // Safe calculation
                         className="w-full h-auto object-cover rounded-lg"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        priority={false}
+                        priority={priority}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-700">

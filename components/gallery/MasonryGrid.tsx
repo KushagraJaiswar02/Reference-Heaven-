@@ -17,8 +17,8 @@ export function MasonryGrid({ images }: MasonryGridProps) {
 
     return (
         <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4 space-y-4 p-4">
-            {images.map((image) => (
-                <PostCard key={image.id} image={image} />
+            {images.map((image, index) => (
+                <PostCard key={image.id} image={image} priority={index < 4} />
             ))}
         </div>
     )

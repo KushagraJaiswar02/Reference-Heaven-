@@ -18,8 +18,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Reference Heaven",
-  description: "High-end image gallery for artists",
+  title: {
+    default: "Reference Heaven",
+    template: "%s | Reference Heaven"
+  },
+  description: "High-end image gallery for artists. Curated reference for anatomy, lighting, and composition.",
+  keywords: ["art reference", "anatomy", "lighting", "composition", "artists", "gallery", "photography"],
+  authors: [{ name: "Reference Heaven Team" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://reference-heaven.app",
+    title: "Reference Heaven",
+    description: "The Ultimate Reference Library for Artists.",
+    siteName: "Reference Heaven",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Reference Heaven",
+    description: "The Ultimate Reference Library for Artists.",
+  },
 };
 
 export default function RootLayout({
