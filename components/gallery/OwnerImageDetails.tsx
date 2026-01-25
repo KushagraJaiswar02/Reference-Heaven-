@@ -97,17 +97,17 @@ export function OwnerImageDetails({
     }
 
     return (
-        <div className={`flex flex-col bg-zinc-950/90 backdrop-blur-2xl border-l border-white/10 z-50 overflow-hidden h-full ${className}`}>
+        <div className={`flex flex-col bg-zinc-950/90 border-l border-white/5 h-full ${className}`}>
             {/* Header Actions */}
-            <div className="p-5 flex items-center justify-between border-b border-white/5 bg-white/5 backdrop-blur-3xl sticky top-0 z-10">
+            <div className="p-6 flex items-center justify-between border-b border-white/5 bg-zinc-950 sticky top-0 z-20">
                 <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-transparent hover:bg-white/10 text-zinc-400 hover:text-white transition-all">
+                    <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-zinc-900 border border-white/5 hover:border-white/10 text-zinc-400 hover:text-white transition-all">
                         <Share2 className="w-4 h-4" />
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="w-9 h-9 rounded-lg bg-transparent hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                        className="w-9 h-9 rounded-lg bg-zinc-900 border border-white/5 hover:border-white/10 text-zinc-400 hover:text-white transition-all"
                         onClick={() => downloadImage(image.url, `${image.title}.jpg`)}
                     >
                         <Download className="w-4 h-4" />
@@ -118,7 +118,7 @@ export function OwnerImageDetails({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className={`w-9 h-9 rounded-lg transition-all duration-300 ${isEditing ? 'bg-indigo-500/10 text-indigo-400' : 'bg-transparent hover:bg-white/10 text-zinc-400 hover:text-white'}`}
+                        className={`w-9 h-9 rounded-lg transition-all duration-300 border border-white/5 ${isEditing ? 'bg-indigo-500/10 text-indigo-400' : 'bg-zinc-900 text-zinc-400 hover:text-white'}`}
                         onClick={() => setIsEditing(!isEditing)}
                     >
                         {isEditing ? <X className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
@@ -126,7 +126,7 @@ export function OwnerImageDetails({
 
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-transparent hover:bg-red-500/10 text-zinc-400 hover:text-red-500 transition-all">
+                            <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-zinc-900 border border-white/5 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 transition-all">
                                 <Trash2 className="w-4 h-4" />
                             </Button>
                         </AlertDialogTrigger>
@@ -149,9 +149,9 @@ export function OwnerImageDetails({
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+            <div className="flex-1 p-6 space-y-8">
                 {isEditing ? (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+                    <div className="space-y-8">
                         {/* Edit Form */}
                         <div className="space-y-4">
                             <Label htmlFor="title" className="text-zinc-500 text-[11px] uppercase tracking-widest font-bold ml-1">Title</Label>
@@ -202,12 +202,12 @@ export function OwnerImageDetails({
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+                    <div className="space-y-8">
                         {/* Title & Description */}
                         <div>
-                            <h1 className="text-3xl font-bold text-white mb-3 tracking-tight leading-tight">{image.title}</h1>
+                            <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight leading-tight">{image.title}</h1>
                             {image.description ? (
-                                <p className="text-zinc-400 text-sm leading-7 font-light">
+                                <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                                     {image.description}
                                 </p>
                             ) : (
@@ -216,9 +216,9 @@ export function OwnerImageDetails({
                         </div>
 
                         {/* Artist Profile */}
-                        <Link href={`/profile/${image.profiles?.username}`} className="block">
-                            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5 backdrop-blur-md hover:bg-white/[0.06] transition-all cursor-pointer group shadow-lg shadow-black/20">
-                                <Avatar className="w-10 h-10 ring-2 ring-white/10 group-hover:ring-indigo-500/50 transition-all">
+                        <Link href={`/profile/${image.profiles?.username}`} className="block group">
+                            <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all cursor-pointer">
+                                <Avatar className="w-10 h-10 ring-2 ring-zinc-800 group-hover:ring-indigo-500/50 transition-all">
                                     <AvatarImage src={image.profiles?.avatar_url || ""} className="object-cover" />
                                     <AvatarFallback className="bg-zinc-800 text-zinc-400 text-xs">{image.profiles?.username?.charAt(0) || '?'}</AvatarFallback>
                                 </Avatar>
@@ -232,7 +232,7 @@ export function OwnerImageDetails({
                             </div>
                         </Link>
 
-                        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                        <div className="w-full h-[1px] bg-white/5"></div>
 
                         {/* Metadata */}
                         <div className="space-y-6">
@@ -243,15 +243,14 @@ export function OwnerImageDetails({
                                     </h3>
                                     <div className="grid grid-cols-1 gap-2">
                                         {image.topic && (
-                                            <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/40 border border-white/[0.03] hover:border-white/[0.08] transition-colors group">
+                                            <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 border border-white/5 transition-colors">
                                                 <div className="flex items-center gap-3">
-                                                    <Hash className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
-                                                    <span className="text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors">Topic</span>
+                                                    <Hash className="w-3.5 h-3.5 text-zinc-500" />
+                                                    <span className="text-xs text-zinc-400">Topic</span>
                                                 </div>
                                                 <span className="text-xs font-medium text-white">{image.topic}</span>
                                             </div>
                                         )}
-
                                     </div>
                                 </div>
                             )}
