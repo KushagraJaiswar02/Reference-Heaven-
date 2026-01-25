@@ -30,6 +30,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
 
     // Initial state from profile
     const [formData, setFormData] = useState({
+        username: profile.username || '',
         bio: profile.bio || '',
         website: profile.website || '',
         socials: {
@@ -47,6 +48,7 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
 
         try {
             const formDataToSend = new FormData()
+            formDataToSend.append('username', formData.username)
             formDataToSend.append('bio', formData.bio)
             formDataToSend.append('website', formData.website)
             formDataToSend.append('socials', JSON.stringify(formData.socials))
@@ -95,6 +97,18 @@ export function ProfileSettings({ profile }: ProfileSettingsProps) {
                             username={profile.username}
                             onFileSelect={setAvatarFile}
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                            id="username"
+                            placeholder="username"
+                            className="bg-zinc-900 border-zinc-800 focus:ring-white/20"
+                            value={formData.username}
+                            onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                        />
+                        <p className="text-xs text-zinc-500">This will be your unique handle and profile URL.</p>
                     </div>
 
                     <div className="space-y-2">

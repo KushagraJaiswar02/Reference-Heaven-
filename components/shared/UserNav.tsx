@@ -43,7 +43,7 @@ export function UserNav({ user, profile }: { user: any, profile: any }) {
             <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{profile?.username || user.user_metadata.full_name || 'User'}</p>
+                        <p className="text-sm font-medium leading-none">@{profile?.username || user.email?.split('@')[0]}</p>
                         <p className="text-xs leading-none text-muted-foreground">
                             {user.email}
                         </p>

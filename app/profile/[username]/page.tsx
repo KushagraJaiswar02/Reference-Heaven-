@@ -52,13 +52,33 @@ export default async function ProfilePage({ params }: Props) {
 
     // 0. Get Current User for "Edit" correctness
     const { data: { user: currentUser } } = await supabase.auth.getUser()
-    const { data: profile, error: profileError } = await supabase
+    // 1. Try to fetch by username
+    let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('username', username)
         .single()
 
-    if (profileError || !profile) {
+    // 2. Fallback: If not found, and matches current session's generated handle, allow access (handling "no username set" state)
+    if (!profile && currentUser) {
+        const emailPrefix = currentUser.email?.split('@')[0]
+        if (username === emailPrefix) {
+            // Fetch own profile
+            const { data: ownProfile, error: ownProfileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single()
+
+            if (ownProfile) {
+                profile = ownProfile
+                // Optionally: We could auto-set the username here? Or just let them see the page.
+                // Let's let them see the page. Ideally they see "Set Username" button.
+            }
+        }
+    }
+
+    if (!profile) {
         notFound()
     }
 

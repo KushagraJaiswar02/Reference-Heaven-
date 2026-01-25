@@ -14,12 +14,31 @@ export async function updateProfile(formData: FormData) {
 
     const bio = formData.get('bio') as string
     const website = formData.get('website') as string
+    const username = formData.get('username') as string
     const socials = JSON.parse(formData.get('socials') as string)
     const avatarFile = formData.get('avatar') as File | null
 
+    // Validate Username
+    if (username && username.length < 3) {
+        return { error: "Username must be at least 3 characters long" }
+    }
+
+    // Check Uniqueness if username changed
+    if (username) {
+        const { data: existingUser } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('username', username)
+            .neq('id', user.id) // Exclude self
+            .single()
+
+        if (existingUser) {
+            return { error: "Username is already taken" }
+        }
+    }
+
     let avatar_url = null
 
-    // Upload Avatar if provided
     // Upload Avatar if provided
     if (avatarFile) {
         const fileExt = avatarFile.name.split('.').pop()
@@ -53,6 +72,7 @@ export async function updateProfile(formData: FormData) {
 
     // Update Profile
     const updateData: any = {
+        username,
         bio,
         website,
         socials,
