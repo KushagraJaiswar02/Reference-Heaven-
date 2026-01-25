@@ -43,7 +43,10 @@ export default async function TaggedPage({ searchParams }: TaggedPageProps) {
         .order('created_at', { ascending: false })
 
     if (error) {
-        console.error("Error fetching tagged images:", error)
+        console.error("Error fetching tagged images details:", JSON.stringify(error, null, 2))
+        console.error("Error message:", error.message)
+        console.error("Error details:", error.details)
+        console.error("Error hint:", error.hint)
         return (
             <div className="flex flex-col items-center justify-center min-h-screen pt-20">
                 <p className="text-red-500">Failed to load tagged images.</p>
