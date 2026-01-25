@@ -63,6 +63,12 @@ export function UserNav({ user, profile }: { user: any, profile: any }) {
                             <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
                         </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/artists" className="w-full cursor-pointer">
+                            Following
+                            <DropdownMenuShortcut>⌘F</DropdownMenuShortcut>
+                        </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem>
                         Settings
                         <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
