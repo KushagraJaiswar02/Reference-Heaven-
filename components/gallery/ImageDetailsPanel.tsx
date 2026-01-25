@@ -12,6 +12,7 @@ interface ImageDetailsPanelProps {
     initialAuthorTags: any[]
     initialCommunityTags: any[]
     initialUserTags: any[]
+    initialIsFollowing: boolean
     className?: string
 }
 
@@ -29,6 +30,7 @@ export function ImageDetailsPanel({
     initialAuthorTags,
     initialCommunityTags,
     initialUserTags,
+    initialIsFollowing,
     className
 }: ImageDetailsPanelProps) {
     const isOwner = currentUserId && image.artist_id === currentUserId
@@ -56,6 +58,7 @@ export function ImageDetailsPanel({
             initialAuthorTags={initialAuthorTags}
             initialCommunityTags={initialCommunityTags}
             initialUserTags={initialUserTags}
+            initialIsFollowing={initialIsFollowing}
             className={className}
         />
     )

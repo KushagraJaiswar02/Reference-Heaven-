@@ -9,6 +9,7 @@ import { SaveButton } from "@/components/SaveButton"
 import { ImageTagsDisplay } from "@/components/image/ImageTagsDisplay"
 import { ColorPalette } from "./ColorPalette"
 import { Image as ImageType } from "@/types"
+import { FollowButton } from "@/components/profile/FollowButton"
 
 interface VisitorImageDetailsProps {
     image: ImageType & { profiles: any }
@@ -19,6 +20,7 @@ interface VisitorImageDetailsProps {
     initialAuthorTags: any[]
     initialCommunityTags: any[]
     initialUserTags: any[]
+    initialIsFollowing: boolean
     className?: string
 }
 
@@ -30,6 +32,7 @@ export function VisitorImageDetails({
     initialAuthorTags,
     initialCommunityTags,
     initialUserTags,
+    initialIsFollowing,
     className
 }: VisitorImageDetailsProps) {
     return (
@@ -88,9 +91,14 @@ export function VisitorImageDetails({
                             <p className="font-medium text-white text-sm truncate group-hover:text-indigo-400 transition-colors">{image.profiles?.username || 'Unknown Artist'}</p>
                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Creator</p>
                         </div>
-                        <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-zinc-400 hover:text-white hover:bg-white/10 -translate-x-2 group-hover:translate-x-0">
-                            Follow
-                        </Button>
+                        <FollowButton
+                            authorId={image.artist_id}
+                            authorName={image.profiles?.username || 'Artist'} // Safely fallback
+                            initialIsFollowing={initialIsFollowing}
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0"
+                        />
                     </div>
                 </Link>
 
@@ -136,7 +144,7 @@ export function VisitorImageDetails({
                         initialUserTags={initialUserTags}
                     />
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }

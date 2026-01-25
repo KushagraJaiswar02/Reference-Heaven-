@@ -11,6 +11,8 @@ import { getUserTagSummary } from "@/app/actions/tagging/user"
 import { YourTagsProfileSection } from "@/components/profile/YourTagsProfileSection"
 import { getGridThumbnailUrl } from "@/lib/image-optim"
 import { ImageCardDTO } from "@/app/data/dto"
+import { getFollowCounts, getFollowStatus } from "@/app/actions/follow"
+import { FollowButton } from "@/components/profile/FollowButton"
 
 interface Props {
     params: Promise<{
@@ -68,6 +70,10 @@ export default async function ProfilePage({ params }: Props) {
     // Fetch personal tags if owner
     const personalTags = isOwner ? await getUserTagSummary(currentUser.id) : []
     console.log("[ProfileDebug] PersonalTags Count:", personalTags.length)
+
+    // 2.5 Fetch Follow Stats
+    const followCounts = await getFollowCounts(profile.id)
+    const isFollowing = currentUser ? await getFollowStatus(profile.id) : false
 
     // 2. Fetch Portfolio (Uploads)
     const { data: images, error: imagesError } = await supabase
@@ -206,7 +212,6 @@ export default async function ProfilePage({ params }: Props) {
                             </div>
                         </div>
 
-                        {/* Stats Bar */}
                         <div className="flex items-center justify-center md:justify-start gap-8 border-y border-border py-6 w-full md:w-fit px-8">
                             <div className="text-center md:text-left">
                                 <p className="text-3xl font-bold text-foreground">{totalUploads}</p>
@@ -214,8 +219,13 @@ export default async function ProfilePage({ params }: Props) {
                             </div>
                             <div className="w-[1px] h-8 bg-border"></div>
                             <div className="text-center md:text-left">
-                                <p className="text-3xl font-bold text-foreground">0</p>
+                                <p className="text-3xl font-bold text-foreground">{followCounts.followers}</p>
                                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mt-1">Followers</p>
+                            </div>
+                            <div className="w-[1px] h-8 bg-border"></div>
+                            <div className="text-center md:text-left">
+                                <p className="text-3xl font-bold text-foreground">{followCounts.following}</p>
+                                <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mt-1">Following</p>
                             </div>
                         </div>
 
@@ -230,9 +240,12 @@ export default async function ProfilePage({ params }: Props) {
                                     </Link>
                                 </>
                             ) : (
-                                <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-8 h-10 font-bold shadow-lg shadow-foreground/20">
-                                    Follow
-                                </Button>
+                                <FollowButton
+                                    authorId={profile.id}
+                                    authorName={profile.username}
+                                    initialIsFollowing={isFollowing}
+                                    className="rounded-full px-8 h-10 font-bold shadow-lg shadow-foreground/20"
+                                />
                             )}
                         </div>
                     </div>

@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { ImageDetailsPanel } from "@/components/gallery/ImageDetailsPanel"
 import { getPublicImageDetails, getUserImageContext } from "@/app/data/image"
+import { getFollowStatus } from "@/app/actions/follow"
 import { RelatedImages } from "@/components/gallery/RelatedImages"
 import { Suspense } from "react"
 
@@ -25,9 +26,11 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
     const { image, canonicalTags, authorTags, communityTags } = publicData
     const { isSaved, userTags } = userContext
 
-    // Get current user for ID passing
+    // Get current user for ID passing & Follow check
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+
+    const isFollowing = user ? await getFollowStatus(image.artist_id) : false
 
     return (
         <div className="container mx-auto px-4 py-8 flex flex-col items-center">
@@ -63,6 +66,7 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
                     initialAuthorTags={authorTags}
                     initialCommunityTags={communityTags}
                     initialUserTags={userTags}
+                    initialIsFollowing={isFollowing}
                     className="w-full md:w-[400px] bg-zinc-900 border-l border-white/5 h-full flex-shrink-0"
                 />
             </div>

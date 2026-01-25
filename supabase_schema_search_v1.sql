@@ -19,7 +19,6 @@ create index if not exists idx_images_fts on public.images using gin(fts);
 -- This function handles the RELEVANCE Ranking part.
 -- Filters are applied *after* or *during* this, but conceptually separate.
 -- For strict separation, we accept generic parameters and return IDs.
-
 create or replace function search_images_scored(
   query_text text,
   input_limit int default 20
