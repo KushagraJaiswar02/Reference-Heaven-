@@ -31,7 +31,7 @@ export function PostCard({ image, priority = false }: PostCardProps) {
             className="block group mb-4 break-inside-avoid relative"
             onMouseEnter={handleMouseEnter}
         >
-            <div className={`relative overflow-hidden rounded-lg backface-visibility-hidden transform-gpu transition-all duration-75 active:scale-95 active:opacity-80 aspect-[1/${(image.aspectRatio || 1)}] bg-muted`}>
+            <div className={`relative overflow-hidden rounded-lg backface-visibility-hidden transform-gpu transition-all duration-75 active:scale-95 active:opacity-80 aspect-[1/${(image.aspectRatio || 1)}] bg-muted group-hover:shadow-md ring-1 ring-black/5`}>
                 {(image.thumbnailUrl || image.url) ? (
                     <Image
                         src={image.thumbnailUrl || image.url}
@@ -49,39 +49,21 @@ export function PostCard({ image, priority = false }: PostCardProps) {
                 )}
 
                 {/* Overlay Feedback */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-4 z-10 pointer-events-none group-hover:pointer-events-auto">
-                    {/* Top Right: Save Button (Red Pill) */}
-                    <div className="flex justify-end pointer-events-auto">
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out pointer-events-none group-hover:pointer-events-auto">
+                    {/* Top Right: Save Button */}
+                    <div className="absolute top-2 right-2 pointer-events-auto">
                         <SaveButton
                             imageId={image.id}
                             initialIsSaved={false}
-                            showLabel={true}
-                            className="rounded-full font-bold shadow-sm hover:scale-105 transition-transform"
+                            showLabel={false} // Icon only for minimal look
+                            className="rounded-full shadow-sm hover:scale-105 transition-transform bg-white/90 hover:bg-white text-black"
                         />
                     </div>
 
-                    {/* Bottom Row */}
-                    <div className="flex items-end justify-between pointer-events-auto">
-                        {/* Bottom Left: Title/Author */}
-                        <div className="flex-1 min-w-0 mr-2 text-shadow-sm pointer-events-none">
-                            <p className="font-semibold text-white text-sm truncate drop-shadow-md">{image.title}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                                {image.author?.avatar_url && (
-                                    <Image
-                                        src={image.author.avatar_url}
-                                        alt={image.author.username}
-                                        width={20}
-                                        height={20}
-                                        className="rounded-full w-5 h-5 bg-zinc-800 ring-1 ring-white/20"
-                                    />
-                                )}
-                                <span className="text-xs text-white/90 font-medium truncate drop-shadow-md">{image.author?.username}</span>
-                            </div>
-                        </div>
-
-                        {/* Bottom Right: Download Button (Circle) */}
+                    {/* Bottom Right: Download Button */}
+                    <div className="absolute bottom-2 right-2 pointer-events-auto">
                         <button
-                            className="w-9 h-9 flex items-center justify-center bg-white hover:bg-zinc-200 rounded-full shadow-md transition-all hover:scale-110 text-black flex-shrink-0"
+                            className="w-9 h-9 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-all hover:scale-110 text-black"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
