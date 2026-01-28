@@ -39,8 +39,9 @@ export function PostCard({ image, priority = false }: PostCardProps) {
                         width={500}
                         height={Math.round(500 / (image.aspectRatio || 1))} // Safe calculation
                         className="w-full h-auto object-cover rounded-lg"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                         priority={priority}
+                        loading={priority ? "eager" : "lazy"}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-700">
