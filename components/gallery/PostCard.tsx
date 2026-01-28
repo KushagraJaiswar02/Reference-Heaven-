@@ -5,6 +5,8 @@ import Image from "next/image"
 import { ImageCardDTO } from "@/app/data/dto"
 import { useRouter } from "next/navigation"
 
+import { memo } from "react"
+
 interface PostCardProps {
     image: ImageCardDTO
     priority?: boolean
@@ -14,7 +16,8 @@ import { SaveButton } from "@/components/SaveButton"
 import { Download } from "lucide-react"
 import { downloadImage } from "@/lib/download"
 
-export function PostCard({ image, priority = false }: PostCardProps) {
+// Define component first to ensure safe export
+function PostCardComponent({ image, priority = false }: PostCardProps) {
     const router = useRouter()
 
     const handleMouseEnter = () => {
@@ -31,7 +34,10 @@ export function PostCard({ image, priority = false }: PostCardProps) {
             className="block group mb-4 break-inside-avoid relative"
             onMouseEnter={handleMouseEnter}
         >
-            <div className={`relative overflow-hidden rounded-lg backface-visibility-hidden transform-gpu transition-all duration-75 active:scale-95 active:opacity-80 aspect-[1/${(image.aspectRatio || 1)}] bg-muted group-hover:shadow-md ring-1 ring-black/5`}>
+            <div
+                className={`relative overflow-hidden rounded-lg backface-visibility-hidden transform-gpu transition-all duration-75 active:scale-95 active:opacity-80 bg-muted group-hover:shadow-md ring-1 ring-black/5`}
+                style={{ aspectRatio: image.aspectRatio || 1 }}
+            >
                 {(image.thumbnailUrl || image.url) ? (
                     <Image
                         src={image.thumbnailUrl || image.url}
@@ -80,3 +86,5 @@ export function PostCard({ image, priority = false }: PostCardProps) {
         </Link>
     )
 }
+
+export const PostCard = memo(PostCardComponent)
