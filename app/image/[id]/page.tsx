@@ -9,6 +9,7 @@ import { getPublicImageDetails, getUserImageContext } from "@/app/data/image"
 import { getFollowStatus } from "@/app/actions/follow"
 import { RelatedImages } from "@/components/gallery/RelatedImages"
 import { Suspense } from "react"
+import { ImageEscapeHandler } from "@/components/gallery/ImageEscapeHandler"
 
 export default async function ImagePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -34,11 +35,15 @@ export default async function ImagePage({ params }: { params: Promise<{ id: stri
 
     return (
         <div className="min-h-screen bg-black text-white">
+            <ImageEscapeHandler />
             {/* Top Navigation (Back) - Absolute or sticky if needed, but absolute is fine for immersion */}
-            <div className="absolute top-4 left-4 z-50">
+            <div className="absolute top-4 left-4 z-50 flex items-center gap-4">
                 <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white bg-black/50 backdrop-blur-md px-4 py-2 rounded-full transition-colors border border-white/10 hover:border-white/20">
                     <ArrowLeft className="w-4 h-4" /> Back
                 </Link>
+                <div className="text-white/30 text-xs font-medium backdrop-blur-sm px-3 py-1.5 rounded-full bg-black/20 pointer-events-none select-none">
+                    Press <span className="font-mono">Esc</span> to exit
+                </div>
             </div>
 
             <div className="flex flex-col lg:flex-row min-h-screen">
