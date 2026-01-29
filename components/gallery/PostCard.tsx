@@ -70,7 +70,7 @@ function PostCardComponent({ image, priority = false }: PostCardProps) {
                     {/* Bottom Right: Download Button */}
                     <div className="absolute bottom-2 right-2 pointer-events-auto">
                         <button
-                            className="w-9 h-9 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-all hover:scale-110 text-black"
+                            className="w-9 h-9 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-all hover:scale-110 text-black relative after:absolute after:-inset-2 after:content-['']"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();

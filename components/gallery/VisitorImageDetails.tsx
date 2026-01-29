@@ -40,13 +40,13 @@ export function VisitorImageDetails({
             {/* Header Actions */}
             <div className="p-6 flex items-center justify-between border-b border-white/5 bg-zinc-950 sticky top-0 z-20">
                 <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-zinc-900 border border-white/5 hover:border-white/10 text-zinc-400 hover:text-white transition-all">
+                    <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg bg-zinc-900 border border-white/5 hover:border-white/10 text-zinc-400 hover:text-white transition-all relative after:absolute after:-inset-2 after:content-['']">
                         <Share2 className="w-4 h-4" />
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="w-9 h-9 rounded-lg bg-zinc-900 border border-white/5 hover:border-white/10 text-zinc-400 hover:text-white transition-all"
+                        className="w-9 h-9 rounded-lg bg-zinc-900 border border-white/5 hover:border-white/10 text-zinc-400 hover:text-white transition-all relative after:absolute after:-inset-2 after:content-['']"
                         onClick={() => downloadImage(image.url, `${image.title}.jpg`)}
                     >
                         <Download className="w-4 h-4" />

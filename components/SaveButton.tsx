@@ -36,7 +36,7 @@ export function SaveButton({ imageId, initialIsSaved, className, showLabel = fal
                 onClick={handleClick}
                 className={cn(
                     "transition-all duration-300 group",
-                    !showLabel && "hover:bg-transparent hover:scale-110",
+                    !showLabel && "hover:bg-transparent hover:scale-110 relative after:absolute after:-inset-2 after:content-['']",
                     showLabel && isSaved && "bg-black/50 text-white hover:bg-black/60", // Saved state (Dark pill)
                     showLabel && !isSaved && "bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-900/20", // Unsaved state (Red pill)
                     className
