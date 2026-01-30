@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import Image from "next/image"
+import { ImageWithFallback } from "@/components/ui/image-with-fallback"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Share2, Link as LinkIcon, MoreHorizontal, Maximize2, Pencil, Trash2, X } from "lucide-react"
@@ -147,11 +147,11 @@ export function ImageModalClient({
                 <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
                     <div className="relative w-full h-full">
                         {displayUrl ? (
-                            <Image
+                            <ImageWithFallback
                                 src={displayUrl}
                                 alt={title || "Image"}
                                 fill
-                                className={`object-contain transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-80 blur-sm'}`}
+                                imageClassName="object-contain"
                                 priority
                                 quality={isImageLoaded ? 100 : 50}
                                 sizes="(max-width: 768px) 100vw, calc(100vw - 400px)"

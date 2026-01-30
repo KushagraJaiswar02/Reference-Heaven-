@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
+import { ImageWithFallback } from "@/components/ui/image-with-fallback"
 import { ImageCardDTO } from "@/app/data/dto"
 import { useRouter } from "next/navigation"
 
@@ -39,12 +39,12 @@ function PostCardComponent({ image, priority = false }: PostCardProps) {
                 style={{ aspectRatio: image.aspectRatio || 1 }}
             >
                 {(image.thumbnailUrl || image.url) ? (
-                    <Image
+                    <ImageWithFallback
                         src={image.thumbnailUrl || image.url}
                         alt={image.title || 'Image'}
                         width={500}
                         height={Math.round(500 / (image.aspectRatio || 1))} // Safe calculation
-                        className="w-full h-auto object-cover rounded-lg"
+                        imageClassName="w-full h-auto object-cover rounded-lg"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                         priority={priority}
                         loading={priority ? "eager" : "lazy"}
