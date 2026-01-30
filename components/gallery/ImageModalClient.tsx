@@ -13,8 +13,8 @@ import { deleteImage } from "@/app/actions/deleteImage"
 import { updateImage } from "@/app/actions/updateImage"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
 import useSWR from "swr"
+import { showToast, TOAST_MESSAGES } from "@/lib/toast-messages"
 import { getClientImageDetails } from "@/app/actions/image/getImageDetail"
 import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/utils/supabase/client"
@@ -91,7 +91,7 @@ export function ImageModalClient({
         try {
             const res = await deleteImage(imageId)
             if (res && res.error) {
-                toast.error(res.error)
+                showToast("error", res.error)
             } else {
                 router.back()
             }
@@ -100,7 +100,7 @@ export function ImageModalClient({
                 router.back()
                 return
             }
-            toast.error("An error occurred")
+            showToast("error", TOAST_MESSAGES.ERROR.GENERIC)
         }
     }
 
@@ -114,14 +114,14 @@ export function ImageModalClient({
             formData.append('topic', topic)
             const res = await updateImage(formData)
             if (res.error) {
-                toast.error(res.error)
+                showToast("error", res.error)
             } else {
-                toast.success("Image updated successfully")
+                showToast("success", TOAST_MESSAGES.IMAGE.UPDATED)
                 setIsEditing(false)
                 // In a real app, we'd mutate SWR here. For now rely on local state or revalidating.
             }
         } catch (error) {
-            toast.error("An error occurred while updating")
+            showToast("error", TOAST_MESSAGES.ERROR.GENERIC)
         } finally {
             setEditLoading(false)
         }
@@ -174,6 +174,7 @@ export function ImageModalClient({
                             initialAuthorTags={data?.publicData?.authorTags || []}
                             initialCommunityTags={data?.publicData?.communityTags || []}
                             initialUserTags={userContext?.userTags || []}
+                            initialIsFollowing={(userContext as any)?.isFollowing || false}
                             className="w-full h-full bg-zinc-900"
                         />
                     ) : (

@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 import { followUser, unfollowUser } from "@/app/actions/follow"
 import { cn } from "@/lib/utils"
+import { showToast, TOAST_MESSAGES } from "@/lib/toast-messages"
 
 interface FollowButtonProps {
     authorId: string
@@ -42,18 +42,17 @@ export function FollowButton({
                 const result = await followUser(authorId)
                 if (result.error) {
                     setIsFollowing(!nextState) // Revert
-                    toast.error(result.error)
+                    showToast("error", result.error)
                 } else {
-                    toast.success(`You're now following ${authorName}`, {
-                        duration: 3000,
-                        dismissible: true,
-                    })
+                    showToast("success", TOAST_MESSAGES.FOLLOW.SUCCESS(authorName))
                 }
             } else {
                 const result = await unfollowUser(authorId)
                 if (result.error) {
                     setIsFollowing(!nextState) // Revert
-                    toast.error(result.error)
+                    showToast("error", result.error)
+                } else {
+                    showToast("success", TOAST_MESSAGES.FOLLOW.UNFOLLOW(authorName))
                 }
             }
         })

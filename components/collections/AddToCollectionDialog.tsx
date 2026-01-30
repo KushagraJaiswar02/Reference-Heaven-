@@ -9,8 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Plus, Loader2 } from "lucide-react"
 import { createCollection, getUserCollections, toggleImageInCollection } from "@/app/actions/collections"
 import { toggleSave } from "@/app/actions/toggleSave"
-import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { showToast, TOAST_MESSAGES } from "@/lib/toast-messages"
 
 interface AddToCollectionDialogProps {
     open: boolean
@@ -45,7 +45,7 @@ export function AddToCollectionDialog({
         setLoading(true)
         const { collections: data, error } = await getUserCollections(imageId)
         if (error) {
-            toast.error("Failed to load collections")
+            showToast("error", TOAST_MESSAGES.ERROR.LOAD_FAIL("collections"))
         } else {
             setCollections(data || [])
         }
@@ -61,9 +61,9 @@ export function AddToCollectionDialog({
         setCreating(false)
 
         if (result.error) {
-            toast.error(result.error)
+            showToast("error", result.error)
         } else {
-            toast.success("Collection created")
+            showToast("success", TOAST_MESSAGES.COLLECTION.CREATED)
             setNewCollectionName("")
             fetchCollections() // Refresh list
         }
@@ -81,12 +81,12 @@ export function AddToCollectionDialog({
             setCollections(prev => prev.map(c =>
                 c.id === collectionId ? { ...c, hasImage: currentStatus } : c
             ))
-            toast.error(result.error)
+            showToast("error", result.error)
         } else {
             if (!currentStatus) {
-                toast.success("Added to collection")
+                showToast("success", TOAST_MESSAGES.COLLECTION.ADDED)
             } else {
-                toast.success("Removed from collection")
+                showToast("success", TOAST_MESSAGES.COLLECTION.REMOVED)
             }
             router.refresh()
         }
@@ -101,12 +101,13 @@ export function AddToCollectionDialog({
         if (result.error) {
             setIsGlobalSaved(!newState)
             onGlobalSaveChange(!newState)
-            toast.error(result.error)
+            showToast("error", result.error)
         } else {
-            if (newState) toast.success("Saved to Library")
-            else toast.success("Removed from Library")
+            if (newState) showToast("success", TOAST_MESSAGES.SAVE.SUCCESS)
+            else showToast("success", TOAST_MESSAGES.SAVE.REMOVED)
             router.refresh()
         }
+
     }
 
     return (
