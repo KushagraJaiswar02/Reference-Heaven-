@@ -1,9 +1,6 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 const DOMAINS = [
@@ -34,42 +31,63 @@ export function FilterBar() {
     }
 
     return (
-        <div className="flex flex-col gap-4 py-2">
+        <div className="flex flex-col gap-6 py-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Filters</h2>
-                <div className="flex items-center space-x-2">
-                    <Switch
-                        id="saved-mode"
-                        checked={savedOnly}
-                        onCheckedChange={(checked) => updateFilter("saved", checked ? "true" : null)}
-                    />
-                    <Label htmlFor="saved-mode">Saved Only</Label>
+                <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-widest text-xs">Filter By</h2>
+                <div className="flex items-center space-x-3 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-full border border-zinc-200 dark:border-zinc-800">
+                    <button
+                        onClick={() => updateFilter("saved", null)}
+                        className={cn(
+                            "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
+                            !savedOnly ? "bg-white dark:bg-black shadow-sm text-foreground" : "text-zinc-500 hover:text-foreground"
+                        )}
+                    >
+                        Global
+                    </button>
+                    <button
+                        onClick={() => updateFilter("saved", "true")}
+                        className={cn(
+                            "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
+                            savedOnly ? "bg-white dark:bg-black shadow-sm text-foreground" : "text-zinc-500 hover:text-foreground"
+                        )}
+                    >
+                        Saved
+                    </button>
                 </div>
             </div>
 
             {/* Domain Chips */}
             <div className="flex flex-wrap gap-2">
-                <Badge
-                    variant={!currentDomain ? "default" : "outline"}
-                    className="cursor-pointer hover:bg-primary/90"
+                <FilterPill
+                    label="All"
+                    isActive={!currentDomain}
                     onClick={() => updateFilter("domain", null)}
-                >
-                    All
-                </Badge>
+                />
                 {DOMAINS.map(d => (
-                    <Badge
+                    <FilterPill
                         key={d.id}
-                        variant={currentDomain === d.id ? "default" : "outline"}
-                        className={cn(
-                            "cursor-pointer hover:bg-primary/90 transition-all",
-                            currentDomain === d.id ? "border-transparent" : "text-muted-foreground"
-                        )}
+                        label={d.label}
+                        isActive={currentDomain === d.id}
                         onClick={() => updateFilter("domain", d.id === currentDomain ? null : d.id)}
-                    >
-                        {d.label}
-                    </Badge>
+                    />
                 ))}
             </div>
         </div>
+    )
+}
+
+function FilterPill({ label, isActive, onClick }: { label: string, isActive: boolean, onClick: () => void }) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 transform active:scale-95 border",
+                isActive
+                    ? "bg-zinc-900 text-white dark:bg-white dark:text-black border-zinc-900 dark:border-white shadow-md"
+                    : "bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+            )}
+        >
+            {label}
+        </button>
     )
 }

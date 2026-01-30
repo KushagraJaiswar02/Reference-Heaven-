@@ -65,32 +65,45 @@ export default async function SearchPage(props: { searchParams: Promise<{ [key: 
     }
 
     return (
-        <div className="container mx-auto py-8 space-y-6">
-            <div className="flex flex-col gap-2 px-4 md:px-0">
-                <h1 className="text-2xl font-bold tracking-tight">
-                    {q ? `Results for "${q}"` : "Explore"}
-                </h1>
+        <div className="container mx-auto py-8 px-4 md:px-8 space-y-8 min-h-screen">
+            <div className="flex flex-col gap-6">
+                {/* Header & Tabs */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-zinc-200 dark:border-zinc-800 pb-1">
+                    <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+                        {q ? <span className="text-zinc-400 font-normal">Results for</span> : "Explore"} {q && `"${q}"`}
+                    </h1>
 
-                {/* Tabs */}
-                <div className="flex gap-4 border-b border-border mt-4">
-                    <Link
-                        href={getTabLink('images')}
-                        className={`pb-2 text-sm font-medium transition-colors border-b-2 ${type === 'images' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                    >
-                        Images
-                    </Link>
-                    <Link
-                        href={getTabLink('accounts')}
-                        className={`pb-2 text-sm font-medium transition-colors border-b-2 ${type === 'accounts' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                    >
-                        Accounts
-                    </Link>
+
+                    <div className="flex gap-8 relative">
+                        <Link
+                            href={getTabLink('images')}
+                            className={`pb-4 text-sm font-medium transition-all relative
+                                ${type === 'images' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'}
+                            `}
+                        >
+                            Images
+                            {type === 'images' && (
+                                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-zinc-900 dark:bg-white rounded-t-full" />
+                            )}
+                        </Link>
+                        <Link
+                            href={getTabLink('accounts')}
+                            className={`pb-4 text-sm font-medium transition-all relative
+                                ${type === 'accounts' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'}
+                            `}
+                        >
+                            Accounts
+                            {type === 'accounts' && (
+                                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-zinc-900 dark:bg-white rounded-t-full" />
+                            )}
+                        </Link>
+                    </div>
                 </div>
             </div>
 
             {type === 'images' ? (
                 <>
-                    <div className="px-4 md:px-0">
+                    <div>
                         <Suspense fallback={<div className="h-20 bg-muted/20 animate-pulse rounded-lg" />}>
                             <FilterBar />
                         </Suspense>
@@ -105,7 +118,7 @@ export default async function SearchPage(props: { searchParams: Promise<{ [key: 
                 </>
             ) : (
                 // Accounts View
-                <div className="px-4 md:px-0">
+                <div>
                     {userResults.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {userResults.map((u: any) => (

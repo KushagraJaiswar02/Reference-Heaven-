@@ -40,15 +40,23 @@ export function GlobalSearchInput() {
 
     return (
         <form onSubmit={handleSearch} className="relative w-full max-w-2xl mx-auto group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500 group-focus-within:text-zinc-800 dark:group-focus-within:text-zinc-200 transition-colors pointer-events-none" />
-            <Input
-                type="search"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="Search for inspiration..."
-                className="w-full h-12 rounded-full pl-12 pr-4 bg-zinc-100/50 dark:bg-zinc-900/50 border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-900 focus-visible:bg-white dark:focus-visible:bg-black focus-visible:ring-2 focus-visible:ring-indigo-500/50 transition-all text-base shadow-sm"
-                name="search"
-            />
+            <div className="relative transform transition-all duration-300 ease-out group-focus-within:scale-[1.02]">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-zinc-800 dark:group-focus-within:text-zinc-200 transition-colors duration-300 pointer-events-none z-10" />
+                <Input
+                    type="search"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    placeholder="Search for inspiration..."
+                    className="w-full h-14 rounded-full pl-14 pr-6 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-sm border-transparent 
+                             hover:bg-zinc-100 dark:hover:bg-zinc-900 
+                             focus-visible:bg-white dark:focus-visible:bg-black 
+                             focus-visible:ring-2 focus-visible:ring-zinc-900/10 dark:focus-visible:ring-white/10 
+                             focus-visible:border-transparent focus-visible:shadow-lg
+                             transition-all duration-300 ease-out 
+                             text-lg placeholder:text-zinc-400 shadow-sm"
+                    name="search"
+                />
+            </div>
         </form>
     )
 }
