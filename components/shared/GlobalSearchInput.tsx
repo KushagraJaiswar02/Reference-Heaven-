@@ -9,39 +9,78 @@ export function GlobalSearchInput() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    // Initialize with URL query if present
+    // 1. Internal Value (Immediate UI feedback)
     const [value, setValue] = React.useState(searchParams.get("q") || "")
 
-    // Sync local state if URL changes (e.g. back button)
+    // 2. Debounced Value (Triggers navigation)
+    const [debouncedValue, setDebouncedValue] = React.useState(searchParams.get("q") || "")
+
+    // 3. Pending Transition State (Optional UI indicator)
+    const [isPending, startTransition] = React.useTransition()
+
+    // Sync internal state if URL changes externally (e.g. back button)
     React.useEffect(() => {
-        setValue(searchParams.get("q") || "")
+        const paramQ = searchParams.get("q") || ""
+        if (paramQ !== debouncedValue) {
+            setValue(paramQ)
+            setDebouncedValue(paramQ)
+        }
     }, [searchParams])
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault()
+    // Debounce Logic
+    React.useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, 300)
 
-        // Construct new URLSearchParams
-        // functionality: If on /search page, preserve filters?
-        // Basic requirement: "Global search input" -> Go to /search?q=...
-        // We will keep other params if we are already on /search, to respect "Clearing search must not clear filters"
-        // actually that requirement is for the Clear Action, but likely implies orthogonality.
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [value])
+
+    // Effect: Trigger Navigation when Debounced Value changes
+    React.useEffect(() => {
+        // Prevent initial run if they match (hydration)
+        const currentQ = searchParams.get("q") || ""
+        if (debouncedValue === currentQ) return
 
         const params = new URLSearchParams(searchParams.toString())
 
-        if (value.trim()) {
-            params.set("q", value.trim())
+        if (debouncedValue.trim()) {
+            params.set("q", debouncedValue.trim())
         } else {
             params.delete("q")
         }
 
-        // If we enter empty search, do we go to /search (all items)? Yes.
-        router.push(`/search?${params.toString()}`)
+        // Use startTransition to mark this as a background update
+        // Use replace to avoid cluttering history stack with every letter, 
+        // OR push if you want separate history entries per "search" (debounced).
+        // Usually, 'push' is better for "I searched for X", but 'replace' is better if typing fixes.
+        // Let's use 'replace' for typing updates to keep history clean, or 'push' if key delta is large?
+        // Standard pattern: Replace for live search interactions.
+        startTransition(() => {
+            router.replace(`/search?${params.toString()}`)
+        })
+
+    }, [debouncedValue, router, searchParams])
+
+    // Handle Enter Key (Immediate Trigger)
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        // Force update immediately (cancel debounce timer effect effectively by setting it?)
+        // Actually, easiest is to just run the nav logic.
+        // But to avoid race with the effect, we can just let the effect handle it 
+        // OR we manually trigger and update debouncedValue to match.
+
+        // If we want immediate navigation:
+        setDebouncedValue(value) // This will trigger the effect immediately if different
     }
 
     return (
-        <form onSubmit={handleSearch} className="relative w-full max-w-2xl mx-auto group">
+        <form onSubmit={handleSubmit} className="relative w-full max-w-2xl mx-auto group">
             <div className="relative transform transition-all duration-300 ease-out group-focus-within:scale-[1.02]">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-zinc-800 dark:group-focus-within:text-zinc-200 transition-colors duration-300 pointer-events-none z-10" />
+                <Search className={`absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-300 pointer-events-none z-10 ${isPending ? "text-amber-500 animate-pulse" : "text-zinc-400 group-focus-within:text-zinc-800 dark:group-focus-within:text-zinc-200"
+                    }`} />
                 <Input
                     type="search"
                     value={value}

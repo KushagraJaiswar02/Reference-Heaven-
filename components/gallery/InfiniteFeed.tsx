@@ -12,19 +12,26 @@ import { usePathname, useSearchParams } from "next/navigation"
 interface InfiniteFeedProps {
     initialItems: ImageCardDTO[]
     initialNextCursor: string | null
-    // We ignore the passed fetchNextPage prop in favor of the direct import for SWR
     fetchNextPage?: any
+    searchParams?: {
+        q?: string
+        domain?: string
+        authorId?: string
+        context?: any
+    }
 }
 
-export function InfiniteFeed({ initialItems, initialNextCursor }: InfiniteFeedProps) {
+export function InfiniteFeed({ initialItems, initialNextCursor, searchParams = {}, fetchNextPage }: InfiniteFeedProps) {
     const pathname = usePathname()
-    const searchParams = useSearchParams()
+    // We still use useSearchParams for the persistence key generation to be safe, 
+    // or we can use the passed props. using props is safer for synchronization.
+    // actually, let's stick to the URL for persistence key as it's the source of truth.
+    const urlSearchParams = useSearchParams()
 
     // Create a unique key for this feed's state based on URL
-    // differentiating between different search queries/pages
-    const persistenceKey = `scroll_restore_${pathname}_${searchParams.toString()}`
+    const persistenceKey = `scroll_restore_${pathname}_${urlSearchParams.toString()}`
 
-    // 1. Recover persisted size synchronously if possible (before render ideally, but inside render is ok for initial state)
+    // 1. Recover persisted size synchronously if possible
     let defaultInitialSize = 1
     if (typeof window !== "undefined") {
         const savedState = sessionStorage.getItem(persistenceKey)
@@ -40,26 +47,33 @@ export function InfiniteFeed({ initialItems, initialNextCursor }: InfiniteFeedPr
 
     const { ref, inView } = useInView({
         threshold: 0,
-        rootMargin: "600px", // Aggressive prefetch (3-4 screen lengths)
+        rootMargin: "600px",
     })
+
+    // SWR Key now includes the search params serialization
+    // We use a stable string representation
+    const swrKeyPrefix = `feed-${JSON.stringify(searchParams)}`
 
     const { data, size, setSize, isValidating } = useSWRInfinite(
         (index, prev) => {
             // First page cursor is null
-            if (index === 0) return ["feed", null]
+            if (index === 0) return [swrKeyPrefix, null]
             // If previous page has no more items, stop
             if (!prev?.hasMore) return null
             // Otherwise use next cursor
-            return ["feed", prev.nextCursor]
+            return [swrKeyPrefix, prev.nextCursor]
         },
         async ([_, cursor]) => {
+            if (fetchNextPage) {
+                return await fetchNextPage(cursor || undefined)
+            }
             return await getPaginatedFeed(cursor ?? undefined, 20)
         },
         {
             revalidateFirstPage: false,
             revalidateOnFocus: false,
             fallbackData: [{ items: initialItems, nextCursor: initialNextCursor, hasMore: !!initialNextCursor }],
-            initialSize: defaultInitialSize // Restore the number of pages loaded
+            initialSize: defaultInitialSize
         }
     )
 

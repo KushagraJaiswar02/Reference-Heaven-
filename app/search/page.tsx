@@ -110,10 +110,17 @@ export default async function SearchPage(props: { searchParams: Promise<{ [key: 
                     </div>
 
                     <InfiniteFeed
-                        key={`${q}-${domain}-${authorId}-${isSaved}`} // Force reset on param change
+                        // key={`${q}-${domain}-${authorId}-${isSaved}`} // Removed to prevent remounting
                         initialItems={items || []}
                         initialNextCursor={nextCursor}
                         fetchNextPage={fetchNextSearchPage}
+                        // Pass params for SWR key construction
+                        searchParams={{
+                            q,
+                            domain,
+                            authorId,
+                            context: isSaved && user ? { type: 'saved' as const, userId: user.id } : { type: 'global' as const }
+                        }}
                     />
                 </>
             ) : (
