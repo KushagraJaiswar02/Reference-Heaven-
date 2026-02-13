@@ -28,9 +28,7 @@ function PostCardComponent({ image, priority = false }: PostCardProps) {
     const href = `/image/${image.id}?thumb=${encodeURIComponent(image.thumbnailUrl)}&ar=${image.aspectRatio}`
 
     return (
-        <Link
-            href={href}
-            prefetch={true}
+        <div
             className="block group mb-4 break-inside-avoid relative"
             onMouseEnter={handleMouseEnter}
         >
@@ -55,8 +53,17 @@ function PostCardComponent({ image, priority = false }: PostCardProps) {
                     </div>
                 )}
 
+                {/* Link Overlay */}
+                <Link
+                    href={href}
+                    prefetch={true}
+                    className="absolute inset-0 z-10"
+                >
+                    <span className="sr-only">View {image.title || 'Image'}</span>
+                </Link>
+
                 {/* Overlay Feedback */}
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out pointer-events-none group-hover:pointer-events-auto">
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out pointer-events-none z-20">
                     {/* Top Right: Save Button */}
                     <div className="absolute top-2 right-2 pointer-events-auto">
                         <SaveButton
@@ -83,7 +90,7 @@ function PostCardComponent({ image, priority = false }: PostCardProps) {
                     </div>
                 </div>
             </div>
-        </Link>
+        </div>
     )
 }
 

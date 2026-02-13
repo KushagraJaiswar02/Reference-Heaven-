@@ -83,26 +83,36 @@ export function VisitorImageDetails({
                 </div>
 
                 {/* Artist Profile - Simplified Card */}
-                <Link href={`/profile/${image.profiles?.username}`} className="block group">
-                    <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all cursor-pointer">
-                        <Avatar className="w-10 h-10 ring-2 ring-zinc-800 group-hover:ring-indigo-500/50 transition-all">
+                <div className="group relative">
+                    <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all">
+                        {/* Link Overlay */}
+                        <Link
+                            href={`/profile/${image.profiles?.username}`}
+                            className="absolute inset-0 z-10 rounded-xl"
+                        >
+                            <span className="sr-only">View Profile</span>
+                        </Link>
+
+                        <Avatar className="w-10 h-10 ring-2 ring-zinc-800 group-hover:ring-indigo-500/50 transition-all relative z-0">
                             <AvatarImage src={image.profiles?.avatar_url || ""} className="object-cover" />
                             <AvatarFallback className="bg-zinc-800 text-zinc-400 text-xs">{image.profiles?.username?.charAt(0) || '?'}</AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 relative z-0">
                             <p className="font-medium text-white text-sm truncate group-hover:text-indigo-400 transition-colors">{image.profiles?.username || 'Unknown Artist'}</p>
                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Creator</p>
                         </div>
-                        <FollowButton
-                            authorId={image.artist_id}
-                            authorName={image.profiles?.username || 'Artist'}
-                            initialIsFollowing={initialIsFollowing}
-                            variant="ghost"
-                            size="sm"
-                            className="opacity-100"
-                        />
+                        <div className="relative z-20">
+                            <FollowButton
+                                authorId={image.artist_id}
+                                authorName={image.profiles?.username || 'Artist'}
+                                initialIsFollowing={initialIsFollowing}
+                                variant="ghost"
+                                size="sm"
+                                className="opacity-100"
+                            />
+                        </div>
                     </div>
-                </Link>
+                </div>
 
                 <div className="w-full h-[1px] bg-white/5"></div>
 
